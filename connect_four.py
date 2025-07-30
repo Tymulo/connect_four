@@ -1,1 +1,16 @@
-print("cos")
+def make_board(num_lns):
+    board = []
+    for i in range(num_lns):
+        board.append(["_","_","_","_","_","_","_"])
+    return board
+
+def print_board(board):
+    for line in board:
+        print(line)
+
+if __name__ == "__main__":
+    num_col = 8
+    num_lns = 6
+    board = make_board(num_lns)
+    
+    print_board(board)
