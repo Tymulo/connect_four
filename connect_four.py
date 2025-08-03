@@ -16,21 +16,14 @@ def make_move(board, move):
         new_column = (int(input("Column you want to place in ")) - 1)
         column = new_column
 
-    for i in reversed(range(6)):
-        if board[i][column] != "":
-            if move == "X":
-                board[i+1][column] = "X"
-                return board
-            if move == "O":
-                board[i+1][column] = "O"
-                return board
-        if i == 5:
-            if move == "X":
-                board[i][column] = "X"
-                return board
-            if move == "O":
-                board[i][column] = "O"
-                return board
+   for i in reversed(range(6)):
+        if t[i -1][column] != " " or i == 0:
+            if move % 2 == 1:
+                t[i][column] = "X"
+            else:
+                t[i][column] = "O"
+            move += 1
+            return board, move
 
 # def check_victory_hov(board, last_move):
 #     # last move
@@ -41,10 +34,10 @@ def make_move(board, move):
 if __name__ == "__main__":
     num_lns = 6
     board = new_board(num_lns)
-    move = "X"
+    move = 0
     print_board(board)
-    move = make_move(board, move)
 
 
     print_board(board)
+
 
