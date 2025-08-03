@@ -42,12 +42,17 @@ def check_hor(board, move):
 if __name__ == "__main__":
     num_lns = 6
     board = new_board(num_lns)
-    move = 0
+    move = "X"
     print_board(board)
-    move = make_move(board, move)
+    x = 0
+    while x != 5:
+        make_move(board, move)
+        x += 1
 
     line = 5
     column = 0
     print_board(board)
-
+    
+    vic = check_hor(board, move)
+    print(vic)
 
