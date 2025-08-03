@@ -5,9 +5,21 @@ def new_board(num_lns):
     return board
 
 def print_board(board):
+    print("  1    2    3    4    5    6    7")
     for line in board:
         print(line)
-
+        
+def wybierz():
+    x = 3
+    while x != 1 and x !=2:
+        x = int(input("Chose O (nr 1) or X (nr. 2). To chose click on your keyboard 1 or 2 "))
+        if x!= 1 and x!= 2:
+            print("There's no option ", x)
+    if x == 1:
+        return 0
+    else:
+        return 1
+        
 def make_move(board, move):
     column = (int(input("Column you want to place in ")) - 1)
 
@@ -42,8 +54,9 @@ def check_hor(board, move):
 if __name__ == "__main__":
     num_lns = 6
     board = new_board(num_lns)
-    move = 1
+    move = 0
     print_board(board)
+    w = wybierz()
     x = 0
     while x != 5:
         make_move(board, move)
@@ -55,4 +68,5 @@ if __name__ == "__main__":
     
     vic = check_hor(board, move)
     print(vic)
+
 
