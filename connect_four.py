@@ -1,7 +1,7 @@
 def new_board(num_lns):
     board = []
     for i in range(num_lns):
-        board.append(["","","","","","",""])
+        board.append([" "," "," "," "," "," "," "])
     return board
 
 def print_board(board):
@@ -22,14 +22,21 @@ def wybierz():
         
 def make_move(board, move):
     column = (int(input("Column you want to place in ")) - 1)
-
-    while column > (len(board) - 1) or column < 0 or (board[0][column]) != "":
+    while column > (len(board) - 1) or column < 0 or (board[0][column]) != " ":
         print("Invalid column ")
         new_column = (int(input("Column you want to place in ")) - 1)
         column = new_column
 
-    for i in reversed(range(6)):
-        if board[i -1][column] != " " or i == 0:
+    for i in range(6):
+        if board[i][column] != " ":
+            if move % 2 == 1:
+                board[i-1][column] = "X"
+            else:
+                board[i-1][column] = "O"
+            move += 1
+            return board, move
+        
+        elif i == 5:
             if move % 2 == 1:
                 board[i][column] = "X"
             else:
@@ -38,25 +45,47 @@ def make_move(board, move):
             return board, move
 
 def check_hor(board, move):
+    if move % 2 == 1:
+        move = "X"
+    else:
+        move = "O"
+        
     line = 0
     while line != 6:
         column = 0
-        while column + 3 != 6:
+        while column + 3 != 7:
             if board[line][column] + board[line][column+1] + board[line][column+2] + board[line][column+3] == move * 4:
                 return True
             else:
                 column += 1
         line += 1
+    return False
 
 # def check_ver(board, move):
-
+#     if move % 2 == 1:
+#         move = "X"
+#     else:
+#         move = "O"
+        
+#     line = 0
+#     while line + 3 != 6:
+#         column = 0
+#         while column != 7:
+#             if board[line][column] + board[line][column+1] + board[line][column+2] + board[line][column+3] == move * 4:
+#                 return True
+#             else:
+#                 column += 1
+#         line += 1
+#     return False
 
 if __name__ == "__main__":
     num_lns = 6
     board = new_board(num_lns)
-    move = 0
+    
     print_board(board)
-    w = wybierz()
+    move = wybierz()
+
+
     x = 0
     while x != 5:
         make_move(board, move)
