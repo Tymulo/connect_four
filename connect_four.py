@@ -44,7 +44,6 @@ if __name__ == "__main__":
     move = "X"
     print_board(board)
     move = make_move(board, move)
-    print(move)
 
 
     print_board(board)
