@@ -5,9 +5,10 @@ def gravity(t, x, move):
         return t, move
     for i in reversed(range(5)):
         if t[x][i] != " " or i == 0:
-            if move % 2 == 1:
+            if move % 2 == 0:
                 t[x][i] = "X"
             else:
                 t[x][i] = "O"
             move += 1
             return t, move
+
