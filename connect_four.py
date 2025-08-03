@@ -50,3 +50,4 @@ if __name__ == "__main__":
     column = 0
     print_board(board)
 
+
