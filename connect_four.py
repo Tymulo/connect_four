@@ -17,20 +17,13 @@ def make_move(board, move):
         column = new_column
 
     for i in reversed(range(6)):
-        if board[i][column] != "":
-            if move == "X":
-                board[i+1][column] = "X"
-                return board
-            if move == "O":
-                board[i+1][column] = "O"
-                return board
-        if i == 5:
-            if move == "X":
+        if board[i -1][column] != " " or i == 0:
+            if move % 2 == 1:
                 board[i][column] = "X"
-                return board
-            if move == "O":
+            else:
                 board[i][column] = "O"
-                return board
+            move += 1
+            return board, move
 
 def check_hor(board, move):
     line = 0
@@ -49,16 +42,11 @@ def check_hor(board, move):
 if __name__ == "__main__":
     num_lns = 6
     board = new_board(num_lns)
-    move = "X"
+    move = 0
     print_board(board)
-    x = 0
-    while x != 5:
-        make_move(board, move)
-        x += 1
+    move = make_move(board, move)
 
     line = 5
     column = 0
     print_board(board)
-    
-    vic = check_hor(board, move)
-    print(vic)
+
