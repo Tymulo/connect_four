@@ -1,7 +1,7 @@
 def make_board(num_lns):
     board = []
     for i in range(num_lns):
-        board.append(["_","_","_","_","_","_","_"])
+        board.append([" "," "," "," "," "," "," "])
     return board
 
 def print_board(board):
@@ -15,3 +15,4 @@ if __name__ == "__main__":
     move = 0
 
     print_board(board)
+
