@@ -1,7 +1,7 @@
 def new_board(num_lns):
     board = []
     for i in range(num_lns):
-        board.append(["q","","","","","",""])
+        board.append(["","","","","","",""])
     return board
 
 def print_board(board):
@@ -16,7 +16,7 @@ def make_move(board, move):
         new_column = (int(input("Column you want to place in ")) - 1)
         column = new_column
 
-    for i in reversed(range(5)):
+    for i in reversed(range(6)):
         if board[i][column] != "":
             if move == "X":
                 board[i+1][column] = "X"
@@ -24,7 +24,7 @@ def make_move(board, move):
             if move == "O":
                 board[i+1][column] = "O"
                 return board
-        if i == 0:
+        if i == 5:
             if move == "X":
                 board[i][column] = "X"
                 return board
@@ -39,10 +39,13 @@ def make_move(board, move):
 
 
 if __name__ == "__main__":
-    num_col = 8
     num_lns = 6
     board = new_board(num_lns)
     move = "X"
     print_board(board)
     move = make_move(board, move)
     print(move)
+
+
+    print_board(board)
+
