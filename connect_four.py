@@ -21,7 +21,7 @@ def make_move(board, move):
             if move % 2 == 1:
                 t[i][column] = "X"
             else:
-                t[i][column] = "O"
+                board[i][column] = "O"
             move += 1
             return board, move
 
@@ -39,5 +39,6 @@ if __name__ == "__main__":
 
 
     print_board(board)
+
 
 
