@@ -32,10 +32,18 @@ def make_move(board, move):
                 board[i][column] = "O"
                 return board
 
-# def check_victory_hov(board, last_move):
-#     # last move
+def check_hor(board, move):
+    line = 0
+    while line != 6:
+        column = 0
+        while column + 3 != 6:
+            if board[line][column] + board[line][column+1] + board[line][column+2] + board[line][column+3] == move * 4:
+                return True
+            else:
+                column += 1
+        line += 1
 
-
+# def check_ver(board, move):
 
 
 if __name__ == "__main__":
@@ -43,8 +51,14 @@ if __name__ == "__main__":
     board = new_board(num_lns)
     move = "X"
     print_board(board)
-    move = make_move(board, move)
+    x = 0
+    while x != 5:
+        make_move(board, move)
+        x += 1
 
-
+    line = 5
+    column = 0
     print_board(board)
-
+    
+    vic = check_hor(board, move)
+    print(vic)
