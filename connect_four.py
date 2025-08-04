@@ -22,7 +22,7 @@ def wybierz():
         
 def make_move(board, move):
     column = (int(input("Column you want to place in ")) - 1)
-    while column > (len(board) - 1) or column < 0 or (board[0][column]) != " ":
+    while column > (len(board)) or column < 0 or (board[0][column]) != " ":
         print("Invalid column ")
         new_column = (int(input("Column you want to place in ")) - 1)
         column = new_column
@@ -107,7 +107,7 @@ def victory_checker(board, move):
         return False
     
 
-    
+
 if __name__ == "__main__":
     num_lns = 6
     board = new_board(num_lns)
@@ -115,18 +115,22 @@ if __name__ == "__main__":
     print_board(board)
     move = wybierz()
 
-
-    x = 0
-    while x != 5:
+    victory = False
+    while victory != True:
+        if move % 2 == 1:
+            print(f'Player X move')
+        else:
+            print(f'Player O move')
+        
         make_move(board, move)
-        x += 1
+        print_board(board)
+        victory = victory_checker(board, move)
+        move += 1
 
-    line = 5
-    column = 0
-    print_board(board)
-    
-    victory = victory_checker(board, move)
-    print(victory)
+    if move % 2 == 1:
+        print(f'The player X won!!!')
+    else:
+        print(f'The player O won!!!')
 
     # hor = check_hor(board, move)
     # ver = check_ver(board, move)
