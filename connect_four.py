@@ -61,23 +61,53 @@ def check_hor(board, move):
         line += 1
     return False
 
-# def check_ver(board, move):
-#     if move % 2 == 1:
-#         move = "X"
-#     else:
-#         move = "O"
+def check_ver(board, move):
+    if move % 2 == 1:
+        move = "X"
+    else:
+        move = "O"
         
-#     line = 0
-#     while line + 3 != 6:
-#         column = 0
-#         while column != 7:
-#             if board[line][column] + board[line][column+1] + board[line][column+2] + board[line][column+3] == move * 4:
-#                 return True
-#             else:
-#                 column += 1
-#         line += 1
-#     return False
+    line = 0
+    while line + 3 != 6:
+        column = 0
+        while column != 7:
+            if board[line][column] + board[line+1][column] + board[line+2][column] + board[line+3][column] == move * 4:
+                return True
+            else:
+                column += 1
+        line += 1
+    return False
 
+def check_diag(board, move):
+    if move % 2 == 1:
+        move = "X"
+    else:
+        move = "O"
+    line = 0
+    while line + 3 != 6:
+        column = 0
+        while column + 3 != 7:
+            if board[line][column] + board[line+1][column+1] + board[line+2][column+2] + board[line+3][column+3] == move * 4:
+                return True
+            if board[line][column+3] + board[line+1][column+2] + board[line+2][column+1] + board[line+3][column] == move * 4:
+                return True
+            else:
+                column += 1
+        line += 1
+    return False
+
+
+def victory_checker(board, move):
+    hor = check_hor(board, move)
+    ver = check_ver(board, move)
+    diag = check_diag(board,move)
+    if hor == True or ver == True or diag == True:
+        return True
+    else:
+        return False
+    
+
+    
 if __name__ == "__main__":
     num_lns = 6
     board = new_board(num_lns)
@@ -95,7 +125,14 @@ if __name__ == "__main__":
     column = 0
     print_board(board)
     
-    vic = check_hor(board, move)
-    print(vic)
+    victory = victory_checker(board, move)
+    print(victory)
 
+    # hor = check_hor(board, move)
+    # ver = check_ver(board, move)
+    # diag = check_diag(board,move)
+
+    # print(f'Horizontal victory: {hor}')
+    # print(f'Vertical victory: {ver}')
+    # print(f'Diagonal victory: {diag}')
 
