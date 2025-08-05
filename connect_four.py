@@ -21,6 +21,7 @@ def wybierz():
         return 1
         
 def make_move(board, move):
+    symbol = get_player_symbol(move)
     column = (int(input("Column you want to place in ")) - 1)
     while column > (len(board)) or column < 0 or (board[0][column]) != " ":
         print("Invalid column ")
@@ -29,27 +30,16 @@ def make_move(board, move):
 
     for i in range(6):
         if board[i][column] != " ":
-            if move % 2 == 1:
-                board[i-1][column] = "X"
-            else:
-                board[i-1][column] = "O"
+            board[i-1][column] = symbol
             move += 1
             return board, move
-        
         elif i == 5:
-            if move % 2 == 1:
-                board[i][column] = "X"
-            else:
-                board[i][column] = "O"
+            board[i][column] = symbol
             move += 1
             return board, move
 
 def check_hor(board, move):
-    if move % 2 == 1:
-        move = "X"
-    else:
-        move = "O"
-        
+    move = get_player_symbol(move)
     line = 0
     while line != 6:
         column = 0
@@ -62,11 +52,7 @@ def check_hor(board, move):
     return False
 
 def check_ver(board, move):
-    if move % 2 == 1:
-        move = "X"
-    else:
-        move = "O"
-        
+    move = get_player_symbol(move)   
     line = 0
     while line + 3 != 6:
         column = 0
@@ -79,10 +65,7 @@ def check_ver(board, move):
     return False
 
 def check_diag(board, move):
-    if move % 2 == 1:
-        move = "X"
-    else:
-        move = "O"
+    move = get_player_symbol(move)
     line = 0
     while line + 3 != 6:
         column = 0
@@ -105,7 +88,13 @@ def victory_checker(board, move):
         return True
     else:
         return False
-    
+
+
+def get_player_symbol(move):
+    if move % 2 == 1:
+        return "X"
+    else:
+        return "O"
 
 
 if __name__ == "__main__":
@@ -117,20 +106,15 @@ if __name__ == "__main__":
 
     victory = False
     while victory != True:
-        if move % 2 == 1:
-            print(f'Player X move')
-        else:
-            print(f'Player O move')
-        
+        symbol = get_player_symbol(move)
+        print(f'Player {symbol} move')
         make_move(board, move)
         print_board(board)
         victory = victory_checker(board, move)
         move += 1
 
-    if move % 2 == 1:
-        print(f'The player X won!!!')
-    else:
-        print(f'The player O won!!!')
+    print(f'The player {symbol} won!!!')
+    
 
     # hor = check_hor(board, move)
     # ver = check_ver(board, move)
