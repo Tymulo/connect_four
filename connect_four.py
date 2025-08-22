@@ -4,7 +4,9 @@ def new_board(num_lns):
         board.append([" "," "," "," "," "," "," "])
     return board
 
-def print_board(board):
+def print_board(board, move):
+    print(" ")
+    print("move: ", move)
     print("  1    2    3    4    5    6    7")
     for line in board:
         print(line)
@@ -102,14 +104,15 @@ if __name__ == "__main__":
     board = new_board(num_lns)
     
     print_board(board)
-    move = wybierz()
+    move = 0
+    w = wybierz()
 
     victory = False
     while victory != True:
         symbol = get_player_symbol(move)
         print(f'Player {symbol} move')
         make_move(board, move)
-        print_board(board)
+        print_board(board, move)
         victory = victory_checker(board, move)
         move += 1
 
