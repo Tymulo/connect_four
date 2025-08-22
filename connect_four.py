@@ -1,3 +1,43 @@
+import tkinter as tk
+
+game_mode = None  
+
+def set_mode(mode):
+    global game_mode
+    game_mode = mode
+    root.destroy()  
+
+root = tk.Tk()
+root.title("Choose game mode")
+root.geometry("350x250")
+
+label = tk.Label(root, text="Chose game mode:", font=("Arial", 14))
+label.pack(pady=20)
+
+btn1 = tk.Button(root, text="2 Graczy", width=10, command=lambda: set_mode("2p"))
+btn1.pack(pady=5)
+
+btn2 = tk.Button(root, text="Easy Bot", width=10, command=lambda: set_mode("easy"))
+btn2.pack(pady=5)
+
+btn3 = tk.Button(root, text="Medium Bot", width=10, command=lambda: set_mode("medium"))
+btn3.pack(pady=5)
+
+btn4 = tk.Button(root, text="Hard Bot", width=10, command=lambda: set_mode("hard"))
+btn4.pack(pady=5)
+
+root.mainloop()
+
+import random
+
+if game_mode == "2p":
+    print("2p")
+elif game_mode == "easy":
+    print("easy")
+elif game_mode == "medium":
+    print("medium")
+elif game_mode == "hard":
+    print("hard")
 def new_board(num_lns):
     board = []
     for i in range(num_lns):
@@ -102,9 +142,9 @@ def get_player_symbol(move):
 if __name__ == "__main__":
     num_lns = 6
     board = new_board(num_lns)
-    
-    print_board(board)
     move = 0
+    
+    print_board(board, move)
     w = wybierz()
 
     victory = False
