@@ -1,43 +1,3 @@
-import tkinter as tk
-
-game_mode = None  
-
-def set_mode(mode):
-    global game_mode
-    game_mode = mode
-    root.destroy()  
-
-root = tk.Tk()
-root.title("Choose game mode")
-root.geometry("350x250")
-
-label = tk.Label(root, text="Chose game mode:", font=("Arial", 14))
-label.pack(pady=20)
-
-btn1 = tk.Button(root, text="2 Graczy", width=10, command=lambda: set_mode("2p"))
-btn1.pack(pady=5)
-
-btn2 = tk.Button(root, text="Easy Bot", width=10, command=lambda: set_mode("easy"))
-btn2.pack(pady=5)
-
-btn3 = tk.Button(root, text="Medium Bot", width=10, command=lambda: set_mode("medium"))
-btn3.pack(pady=5)
-
-btn4 = tk.Button(root, text="Hard Bot", width=10, command=lambda: set_mode("hard"))
-btn4.pack(pady=5)
-
-root.mainloop()
-
-import random
-
-if game_mode == "2p":
-    print("2p")
-elif game_mode == "easy":
-    print("easy")
-elif game_mode == "medium":
-    print("medium")
-elif game_mode == "hard":
-    print("hard")
 def new_board(num_lns):
     board = []
     for i in range(num_lns):
@@ -51,25 +11,27 @@ def print_board(board, move):
     for line in board:
         print(line)
         
-def wybierz():
+def choose_symbol():
     x = 3
     while x != 1 and x !=2:
         x = int(input("Chose O (nr 1) or X (nr. 2). To chose click on your keyboard 1 or 2 "))
-        if x!= 1 and x!= 2:
+        if x!= 1 and x != 2:
             print("There's no option ", x)
-    if x == 1:
-        return 0
-    else:
-        return 1
-        
-def make_move(board, move):
-    symbol = get_player_symbol(move)
-    column = (int(input("Column you want to place in ")) - 1)
-    while column > (len(board)) or column < 0 or (board[0][column]) != " ":
-        print("Invalid column ")
-        new_column = (int(input("Column you want to place in ")) - 1)
-        column = new_column
 
+    if x == 1:
+        return 0, False
+    else:
+        return 1, False
+
+def get_player_symbol(move):
+    if move % 2 == 1:
+        return "X"
+    else:
+        return "O"
+    
+
+def make_move(board, move, column):
+    symbol = get_player_symbol(move)
     for i in range(6):
         if board[i][column] != " ":
             board[i-1][column] = symbol
@@ -79,6 +41,14 @@ def make_move(board, move):
             board[i][column] = symbol
             move += 1
             return board, move
+
+def player_input(board):
+    column = (int(input("Column you want to place in ")) - 1)
+    while column > (len(board)) or column < 0 or (board[0][column]) != " ":
+        print("Invalid column ")
+        new_column = (int(input("Column you want to place in ")) - 1)
+        column = new_column
+    return column
 
 def check_hor(board, move):
     move = get_player_symbol(move)
@@ -132,38 +102,89 @@ def victory_checker(board, move):
         return False
 
 
-def get_player_symbol(move):
-    if move % 2 == 1:
-        return "X"
-    else:
-        return "O"
 
+
+def set_mode(mode):
+    global game_mode
+    game_mode = mode
+    root.destroy()
+    if game_mode == "2p":
+        print("2p")
+    elif game_mode == "easy":
+        print("easy")
+    elif game_mode == "medium":
+        print("medium")
+    elif game_mode == "hard":
+        print("hard")
+
+def bot_easy(board):
+    column = random.randint(0,8)
+    while column > (len(board)) or column < 0 or (board[0][column]) != " ":
+        new_column = column = random.randint(0,8)
+        column = new_column
+    return column
 
 if __name__ == "__main__":
+    import random
+    import tkinter as tk
+    import copy
+
+    game_mode = None
+
     num_lns = 6
     board = new_board(num_lns)
     move = 0
-    
-    print_board(board, move)
-    w = wybierz()
 
-    victory = False
-    while victory != True:
-        symbol = get_player_symbol(move)
-        print(f'Player {symbol} move')
-        make_move(board, move)
-        print_board(board, move)
-        victory = victory_checker(board, move)
-        move += 1
+    root = tk.Tk()
+    root.title("Choose game mode")
+    root.geometry("350x250")
+
+    label = tk.Label(root, text="Chose game mode:", font=("Arial", 14))
+    label.pack(pady=20)
+
+    btn1 = tk.Button(root, text="2 Graczy", width=10, command=lambda: set_mode("2p"))
+    btn1.pack(pady=5)
+
+    btn2 = tk.Button(root, text="Easy Bot", width=10, command=lambda: set_mode("easy"))
+    btn2.pack(pady=5)
+
+    btn3 = tk.Button(root, text="Medium Bot", width=10, command=lambda: set_mode("medium"))
+    btn3.pack(pady=5)
+
+    btn4 = tk.Button(root, text="Hard Bot", width=10, command=lambda: set_mode("hard"))
+    btn4.pack(pady=5)
+
+    root.mainloop()
+
+    print_board(board, move)
+
+    move, bot = choose_symbol()
+    bot_id = copy.deepcopy(move)
+    bot_id = (bot_id + 1) % 2
+
+    if game_mode == "easy" or game_mode == "medium" or game_mode == "hard":
+        victory = False
+        while victory != True:
+            symbol = get_player_symbol(move)
+            print(f'Player {symbol} move')
+            if move % 2 == bot_id:
+                column = bot_easy(board)
+            else:
+                column = player_input(board)
+            make_move(board, move, column)
+            print_board(board, move)
+            victory = victory_checker(board, move)
+            move += 1
+    else:
+        victory = False
+        while victory != True:
+            symbol = get_player_symbol(move)
+            print(f'Player {symbol} move')
+            column = player_input(board)
+            make_move(board, move, column)
+            print_board(board, move)
+            victory = victory_checker(board, move)
+            move += 1
 
     print(f'The player {symbol} won!!!')
     
-
-    # hor = check_hor(board, move)
-    # ver = check_ver(board, move)
-    # diag = check_diag(board,move)
-
-    # print(f'Horizontal victory: {hor}')
-    # print(f'Vertical victory: {ver}')
-    # print(f'Diagonal victory: {diag}')
-
