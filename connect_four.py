@@ -102,8 +102,6 @@ def victory_checker(board, move):
         return False
 
 
-
-
 def set_mode(mode):
     global game_mode
     game_mode = mode
@@ -118,9 +116,9 @@ def set_mode(mode):
         print("hard")
 
 def bot_easy(board):
-    column = random.randint(0,8)
+    column = random.randint(0,6)
     while column > (len(board)) or column < 0 or (board[0][column]) != " ":
-        new_column = column = random.randint(0,8)
+        new_column = column = random.randint(0,6)
         column = new_column
     return column
 
