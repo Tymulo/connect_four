@@ -118,10 +118,8 @@ def set_mode(mode):
         print("hard")
 
 def bot_easy(board, x, move):
-    if move < 6:
-        column = random.randint(3, 5)
-    elif move > 6 and move<10:
-        column = random.randint(2, 6)
+    if move < 5:
+        column = random.randint(2, 4)
     else:
         z = random.randint(0, 100)
         if z%5 == 0:
@@ -133,7 +131,6 @@ def bot_easy(board, x, move):
     while column > (len(board)) or column < 0 or (board[0][column]) != " ":
         new_column = column = bot_easy(board, x, move)
         column = new_column
-    column -= 1
     return column
 
 if __name__ == "__main__":
@@ -199,4 +196,3 @@ if __name__ == "__main__":
 
     print(f'The player {symbol} won!!!')
     
-
