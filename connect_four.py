@@ -118,8 +118,6 @@ def set_mode(mode):
         print("hard")
 
 def bot_easy(board, x, move):
-    if move == 0:
-        column = random.randint(1,7)
     if move < 6:
         column = random.randint(3, 5)
     elif move > 6 and move<10:
@@ -201,3 +199,4 @@ if __name__ == "__main__":
 
     print(f'The player {symbol} won!!!')
     
+
