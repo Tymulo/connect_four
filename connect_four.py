@@ -6,7 +6,7 @@ def new_board(num_lns):
 
 def print_board(board, move):
     print(" ")
-    print("move: ", move)
+    print("move: ", move + 1)
     print("  1    2    3    4    5    6    7")
     for line in board:
         print(line)
@@ -45,7 +45,7 @@ def make_move(board, move, column):
 def player_input(board):
     column = (int(input("Column you want to place in ")) - 1)
     while column > (len(board)) or column < 0 or (board[0][column]) != " ":
-        print("Invalid column ")
+        print("That column is full ")
         new_column = (int(input("Column you want to place in ")) - 1)
         column = new_column
     return column
@@ -115,12 +115,28 @@ def set_mode(mode):
     elif game_mode == "hard":
         print("hard")
 
-def bot_easy(board):
-    column = random.randint(0,6)
+
+def bot_easy(board, x, move):
+    if move == 0:
+        column = random.randint(1,7)
+    if move < 6:
+        column = random.randint(3, 5)
+    elif move > 6 and move<10:
+        column = random.randint(2, 6)
+    else:
+        z = random.randint(0, 100)
+        if z%5 == 0:
+            column = random.randint(1, 7)
+        elif z%5 == 1 or z%5 == 2:
+            column = x
+        else:
+            column = x + random.choice([-1, 1])
     while column > (len(board)) or column < 0 or (board[0][column]) != " ":
-        new_column = column = random.randint(0,6)
+        new_column = column = bot_easy(board, x, move)
         column = new_column
+    column -= 1
     return column
+
 
 if __name__ == "__main__":
     import random
@@ -140,7 +156,7 @@ if __name__ == "__main__":
     label = tk.Label(root, text="Chose game mode:", font=("Arial", 14))
     label.pack(pady=20)
 
-    btn1 = tk.Button(root, text="2 Graczy", width=10, command=lambda: set_mode("2p"))
+    btn1 = tk.Button(root, text="2 Players", width=10, command=lambda: set_mode("2p"))
     btn1.pack(pady=5)
 
     btn2 = tk.Button(root, text="Easy Bot", width=10, command=lambda: set_mode("easy"))
@@ -160,13 +176,13 @@ if __name__ == "__main__":
     bot_id = copy.deepcopy(move)
     bot_id = (bot_id + 1) % 2
 
-    if game_mode == "easy" or game_mode == "medium" or game_mode == "hard":
-        victory = False
+    victory = False
+    if game_mode != "2p":
         while victory != True:
             symbol = get_player_symbol(move)
             print(f'Player {symbol} move')
             if move % 2 == bot_id:
-                column = bot_easy(board)
+                column = bot_easy(board, column, move)
             else:
                 column = player_input(board)
             make_move(board, move, column)
@@ -174,7 +190,6 @@ if __name__ == "__main__":
             victory = victory_checker(board, move)
             move += 1
     else:
-        victory = False
         while victory != True:
             symbol = get_player_symbol(move)
             print(f'Player {symbol} move')
