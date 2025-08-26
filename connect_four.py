@@ -102,6 +102,8 @@ def victory_checker(board, move):
         return False
 
 
+
+
 def set_mode(mode):
     global game_mode
     game_mode = mode
@@ -114,7 +116,6 @@ def set_mode(mode):
         print("medium")
     elif game_mode == "hard":
         print("hard")
-
 
 def bot_easy(board, x, move):
     if move < 5:
@@ -143,17 +144,22 @@ def medium_bot(board, move):
     for i in range(7):
         if(board[5][i] == " "):
             t = copy.deepcopy(board)
-            make_move(t, move, i)
+            t, _ = make_move(t, move, i)
             if victory_checker(t, move):
                 return i
-            else:
-                for j in range(7):
-                    if(board[5][j] == " "):
-                        d = copy.deepcopy(t)
-                        make_move(d, move + 1, j)
-                        if victory_checker(t, move + 1):
-                            if i != j:
-                                return j
+    for j in range(7):
+        if(board[5][j] == " "):
+            d = copy.deepcopy(board)
+            d, _ = make_move(d, move + 1, j)
+            if victory_checker(d, move + 1):
+                return j
+    if move < 4:
+        column = random.randint(2, 4)
+        return column
+    elif move >4 and move <8:
+        column = random.randint(1, 5)
+    else:
+        column = random.randint(0, 6)
     return column
 
 def play_again(next):
