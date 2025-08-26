@@ -117,12 +117,8 @@ def set_mode(mode):
 
 
 def bot_easy(board, x, move):
-    if move == 0:
-        column = random.randint(1,7)
-    if move < 6:
-        column = random.randint(3, 5)
-    elif move > 6 and move<10:
-        column = random.randint(2, 6)
+    if move < 5:
+        column = random.randint(2, 4)
     else:
         z = random.randint(0, 100)
         if z%5 == 0:
@@ -134,7 +130,30 @@ def bot_easy(board, x, move):
     while column > (len(board)) or column < 0 or (board[0][column]) != " ":
         new_column = column = bot_easy(board, x, move)
         column = new_column
-    column -= 1
+    return column
+
+def medium_bot(board, move):
+    if move < 6:
+        column = random.randint(2, 4)
+        return column
+    elif move >6 and move <10:
+        column = random.randint(1, 5)
+    else:
+        column = random.randint(0, 6)
+    for i in range(7):
+        if(board[5][i] == " "):
+            t = copy.deepcopy(board)
+            make_move(t, move, i)
+            if victory_checker(t, move):
+                return i
+            else:
+                for j in range(7):
+                    if(board[5][j] == " "):
+                        d = copy.deepcopy(t)
+                        make_move(d, move + 1, j)
+                        if victory_checker(t, move + 1):
+                            if i != j:
+                                return j
     return column
 
 
@@ -182,7 +201,10 @@ if __name__ == "__main__":
             symbol = get_player_symbol(move)
             print(f'Player {symbol} move')
             if move % 2 == bot_id:
-                column = bot_easy(board, column, move)
+                if game_mode == "easy":
+                    column = bot_easy(board, column, move)
+                if game_mode == "medium":
+                    column = medium_bot(board, move)
             else:
                 column = player_input(board)
             make_move(board, move, column)
