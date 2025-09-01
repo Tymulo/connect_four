@@ -102,8 +102,6 @@ def victory_checker(board, move):
         return False
 
 
-
-
 def set_mode(mode):
     global game_mode
     game_mode = mode
