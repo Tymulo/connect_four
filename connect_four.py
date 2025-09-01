@@ -155,6 +155,11 @@ def medium_bot(board, move):
         column = random.randint(0, 6)
     return column
 
+def play_again(next):
+    global next_game
+    next_game = next
+    root.destroy()
+    
 if __name__ == "__main__":
     import random
     import tkinter as tk
@@ -192,32 +197,51 @@ if __name__ == "__main__":
     move, bot = choose_symbol()
     bot_id = copy.deepcopy(move)
     bot_id = (bot_id + 1) % 2
+    next_game = True
 
-    victory = False
-    if game_mode != "2p":
-        while victory != True:
-            symbol = get_player_symbol(move)
-            print(f'Player {symbol} move')
-            if move % 2 == bot_id:
-                if game_mode == "easy":
-                    column = bot_easy(board, column, move)
-                if game_mode == "medium":
-                    column = medium_bot(board, move)
-            else:
+    while next_game == True:
+        board = new_board(num_lns)
+        print_board(board, move)
+        victory = False
+        if game_mode != "2p":
+            while victory != True:
+                symbol = get_player_symbol(move)
+                print(f'Player {symbol} move')
+                if move % 2 == bot_id:
+                    if game_mode == "easy":
+                        column = bot_easy(board, column, move)
+                    if game_mode == "medium":
+                        column = medium_bot(board, move)
+                    if game_mode == "hard":
+                        column = medium_bot(board, move)
+                else:
+                    column = player_input(board)
+                make_move(board, move, column)
+                print_board(board, move)
+                victory = victory_checker(board, move)
+                move += 1
+        else:
+            while victory != True:
+                symbol = get_player_symbol(move)
+                print(f'Player {symbol} move')
                 column = player_input(board)
-            make_move(board, move, column)
-            print_board(board, move)
-            victory = victory_checker(board, move)
-            move += 1
-    else:
-        while victory != True:
-            symbol = get_player_symbol(move)
-            print(f'Player {symbol} move')
-            column = player_input(board)
-            make_move(board, move, column)
-            print_board(board, move)
-            victory = victory_checker(board, move)
-            move += 1
+                make_move(board, move, column)
+                print_board(board, move)
+                victory = victory_checker(board, move)
+                move += 1
+        print(f'The player {symbol} won!!!')
 
-    print(f'The player {symbol} won!!!')
     
+
+        root = tk.Tk()
+        root.title("Play again")
+        root.geometry("350x250")
+
+        label = tk.Label(root, text="Do you want to play again", font=("Arial", 14))
+        label.pack(pady=20)
+
+        btn1 = tk.Button(root, text="Yes", width=10, command=lambda: play_again(True))
+        btn1.pack(pady=5)
+        btn2 = tk.Button(root, text="No", width=10, command=lambda: play_again(False))
+        btn2.pack(pady=5)
+        root.mainloop()
