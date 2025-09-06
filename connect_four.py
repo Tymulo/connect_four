@@ -102,8 +102,6 @@ def victory_checker(board, move):
         return False
 
 
-
-
 def set_mode(mode):
     global game_mode
     game_mode = mode
@@ -116,6 +114,7 @@ def set_mode(mode):
         print("medium")
     elif game_mode == "hard":
         print("hard")
+
 
 def bot_easy(board, x, move):
     if move < 5:
@@ -159,11 +158,13 @@ def play_again(next):
     global next_game
     next_game = next
     root.destroy()
-    
+
+
 if __name__ == "__main__":
     import random
     import tkinter as tk
     import copy
+    import pygame
 
     game_mode = None
 
@@ -229,6 +230,7 @@ if __name__ == "__main__":
                 print_board(board, move)
                 victory = victory_checker(board, move)
                 move += 1
+        print(board)
         print(f'The player {symbol} won!!!')
 
     
