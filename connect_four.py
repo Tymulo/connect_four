@@ -235,8 +235,7 @@ def hard_bot(board, move):
 def play_again(next):
     global next_game
     next_game = next
-    root.destroy()
-
+    root.destroy
 
 def draw_button(surface, x, y, width, height, text, font, color):
     pygame.draw.rect(surface, color, (x, y, width, height))
@@ -288,6 +287,18 @@ def click_move(cell_size, num_col, board, move):
         
         return board, move, victory, column
 
+def play_again_window():
+    root = tk.Tk()
+    root.title("Play again")
+    root.geometry("350x250")
+    label = tk.Label(root, text="Do you want to play again", font=("Arial", 14))
+    label.pack(pady=20)
+    btn1 = tk.Button(root, text="Yes", width=10, command=lambda: play_again(True))
+    btn1.pack(pady=5)
+    btn2 = tk.Button(root, text="No", width=10, command=lambda: play_again(False))
+    btn2.pack(pady=5)
+    root.mainloop()
+    root.destroy
 
 if __name__ == "__main__":
     import random
@@ -375,11 +386,23 @@ if __name__ == "__main__":
                     wyjscie_clicked = True
                 if grid_rect.collidepoint(event.pos) and move % 2 != bot_id:
                     board, move, victory, column = click_move(cell_size, num_col, board, move)
-                    
+                    draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                     if victory == True:
                         symbol = get_player_symbol(move)
+                        print(board)
                         print(f'The player {symbol} won!!!')
-                        running = False
+
+                        display_surface.fill(gray)
+                        draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
+                        pygame.display.flip()
+
+                        play_again_window()
+                        if next_game == True:
+                            board = new_board(num_row)
+                        else:
+                            running = False
+
+
         if game_mode != "2p":        
             if move % 2 == bot_id:
                 if game_mode == "easy":
@@ -389,10 +412,23 @@ if __name__ == "__main__":
                 if game_mode == "hard":
                     column = hard_bot(board, move)
                 board, move, victory = make_move(board, move, column) 
+                draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                 if victory == True:
                     symbol = get_player_symbol(move)
+                    print(board)
                     print(f'The player {symbol} won!!!')
-                    running = False
+                
+                    # Draw final board before stopping
+                    display_surface.fill(gray)
+                    draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
+                    pygame.display.flip()
+
+                    play_again_window()
+                    if next_game == True:
+                        board = new_board(num_row)
+                    else:
+                        running = False
+                
 
         display_surface.fill(gray)
         draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
