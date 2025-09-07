@@ -10,7 +10,7 @@ def draw_button(surface, x, y, width, height, text, font, color):
 
 
 def calculate_cell_size(Y, num_row):
-    y = (Y // num_row) - 20
+    y = (Y // num_row) -20
     return y
 
 def draw_grid(surface, cell_size, color, num_row, num_col, symbol_1, symbol_2, board):
@@ -19,8 +19,7 @@ def draw_grid(surface, cell_size, color, num_row, num_col, symbol_1, symbol_2, b
         pos_x = 40
         for c in range(num_col):
             cell = pygame.Rect(pos_x, pos_y, cell_size, cell_size)
-            pygame.draw.rect(surface, color, cell)  # draw border only (1px) so we can see symbols
-            # place symbol_1 centered in the cell
+            pygame.draw.rect(surface, color, cell)
             if board[r][c] == "O":
                 symbol_rect = symbol_1.get_rect(center=cell.center)
                 surface.blit(symbol_1, symbol_rect)
@@ -30,14 +29,11 @@ def draw_grid(surface, cell_size, color, num_row, num_col, symbol_1, symbol_2, b
             pos_x += (cell_size + 10)
         pos_y += (cell_size + 10)
 
-def grid_size(num_row, num_col):
-    pos_y = 40
-    for r in range(num_row):
-        pos_x = 40
-        for c in range(num_col):
-            pos_x += (cell_size + 10)
-    pos_y += (cell_size + 10)
-    return pygame.Rect(40, 40, pos_x, pos_y)
+def grid_size(num_row, num_col, cell_size):
+    start_x, start_y = 40, 40
+    width = num_col * cell_size + (num_col - 1) * 10
+    height = num_row * cell_size + (num_row - 1) * 10
+    return pygame.Rect(start_x, start_y, width, height)
 
 
 def click_move(cell_size, num_row, num_col):
@@ -51,9 +47,6 @@ def click_move(cell_size, num_row, num_col):
 
 pause = False
 music_playing = True
-# player_symbol_1 = (255, 0, 0)
-# player_symbol_2 = (0, 0, 255)
-
 
 num_row = 6
 num_col = 7
@@ -75,19 +68,20 @@ wyjscie_clicked = False
 
 display_surface = pygame.display.set_mode((X, Y))
 font = pygame.font.Font('freesansbold.ttf', 18)
-grid_rect = grid_size(num_row, num_col)
+
+cell_size = calculate_cell_size(Y, num_row)
+grid_rect = grid_size(num_row, num_col, cell_size)
+
 # pygame.mixer.music.load("muzyka.mp3")
 # pygame.mixer.music.set_volume(0.5)
 # pygame.mixer.music.play(-1)
 
-cell_size = calculate_cell_size(Y, num_row)
+
 blue_circle = pygame.image.load("blue_circle.png").convert_alpha()
 red_circle = pygame.image.load("red_circle.png").convert_alpha()
 player_symbol_1 = pygame.transform.smoothscale(blue_circle, (cell_size - 20, cell_size - 20))
 player_symbol_2 = pygame.transform.smoothscale(red_circle, (cell_size - 20, cell_size - 20))
 
-
-clock = pygame.time.Clock()
 running = True
 while running: 
     for event in pygame.event.get():
@@ -99,23 +93,26 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if wyjscie_rect.collidepoint(event.pos) and pause:  
                 wyjscie_clicked = True
-            if grid_rect.collidepoint(event.pos):
-                pygame.mouse.get_pos()
+            # if grid_rect.collidepoint(event.pos):
+            #     pygame.mouse.get_pos()
 
 
     display_surface.fill(gray)
     draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
-
+    pygame.draw.rect(display_surface, blue, grid_rect)
     if pause == True:
         pauza_rect = pauza.get_rect(center=(X // 2, Y // 2))
         display_surface.blit(pauza, pauza_rect)
         display_surface.blit(wyjscie, wyjscie_rect)
+        
         # if music_playing:
         #     display_surface.blit(dzwiek, dzwiek_rect)
         # else:
         #     display_surface.blit(Nie_dzwiek, dzwiek_rect)
+
         if wyjscie_clicked:
             running = False
+
             # elif dzwiek_rect.collidepoint(event.pos) and pause: 
             #     if music_playing:
             #         pygame.mixer.music.pause()
@@ -124,12 +121,5 @@ while running:
             #         pygame.mixer.music.unpause()
             #         music_playing = True
            
-    
-
-    
-
-        
-
     pygame.display.flip()
-    # clock.tick(30)
 pygame.quit()
