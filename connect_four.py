@@ -272,7 +272,7 @@ def grid_size(num_row, num_col, cell_size):
     return pygame.Rect(start_x, start_y, width, height)
 
 
-def click_move(cell_size, num_col, board, move):
+def click_move(cell_size, board, move):
     mouse = pygame.mouse.get_pos()
     mouse_x = mouse[0] - 40
     
@@ -384,8 +384,8 @@ if __name__ == "__main__":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if wyjscie_rect.collidepoint(event.pos) and pause:  
                     wyjscie_clicked = True
-                if grid_rect.collidepoint(event.pos) and move % 2 != bot_id:
-                    board, move, victory, column = click_move(cell_size, num_col, board, move)
+                if grid_rect.collidepoint(event.pos) and game_mode == "2p":
+                    board, move, victory, column = click_move(cell_size, board, move)
                     draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                     if victory == True:
                         symbol = get_player_symbol(move)
