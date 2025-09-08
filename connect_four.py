@@ -157,8 +157,12 @@ def medium_bot(board, move):
         return column
     elif move >4 and move <8:
         column = random.randint(1, 5)
+        while board[0][column] != " ":
+            column = random.randint(1, 5)
     else:
         column = random.randint(0, 6)
+        while board[0][column] != " ":
+            column = random.randint(0, 6)
     return column
 
 def add_points(board, move):
@@ -206,7 +210,8 @@ def min_max(board, move, depth, bot_move):
 def hard_bot(board, move):
     best_score = -float("inf")
     best_col = None
-
+    if move <= 4:
+        return random.randint(2, 4)
     for i in range(7):
         if board[0][i] == " ":
             t = copy.deepcopy(board)
@@ -272,7 +277,7 @@ def grid_size(num_row, num_col, cell_size):
     return pygame.Rect(start_x, start_y, width, height)
 
 
-def click_move(cell_size, board, move):
+def click_move(cell_size, num_col, board, move):
     mouse = pygame.mouse.get_pos()
     mouse_x = mouse[0] - 40
     
@@ -351,6 +356,9 @@ if __name__ == "__main__":
     pauza = pygame.image.load("Pauza.png")
     wyjscie = pygame.image.load("Exit.png")
     wyjscie_rect = wyjscie.get_rect(center=(X//2 + 150, Y//2 + 60))
+    dzwiek = pygame.image.load("Sound.png")
+    Nie_dzwiek = pygame.image.load("Not_sound.png")
+    dzwiek_rect = dzwiek.get_rect(center=(X//2 - 150, Y//2 + 60))
     wyjscie_clicked = False
 
     # dzwiek = pygame.image.load("Sound.png")
@@ -384,8 +392,8 @@ if __name__ == "__main__":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if wyjscie_rect.collidepoint(event.pos) and pause:  
                     wyjscie_clicked = True
-                if grid_rect.collidepoint(event.pos) and game_mode == "2p":
-                    board, move, victory, column = click_move(cell_size, board, move)
+                if grid_rect.collidepoint(event.pos) and move % 2 != bot_id:
+                    board, move, victory, column = click_move(cell_size, num_col, board, move)
                     draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                     if victory == True:
                         symbol = get_player_symbol(move)
@@ -438,6 +446,10 @@ if __name__ == "__main__":
             pauza_rect = pauza.get_rect(center=(X // 2, Y // 2))
             display_surface.blit(pauza, pauza_rect)
             display_surface.blit(wyjscie, wyjscie_rect)
+            if music_playing:
+                display_surface.blit(dzwiek, dzwiek_rect)
+            else:
+                display_surface.blit(Nie_dzwiek, dzwiek_rect)
 
             # if music_playing:
             #     display_surface.blit(dzwiek, dzwiek_rect)
