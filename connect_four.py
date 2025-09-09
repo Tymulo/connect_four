@@ -109,7 +109,7 @@ def victory_checker(board, move):
         return False
 
 
-def set_mode(mode):
+def set_mode(mode, root):
     global game_mode
     game_mode = mode
     root.destroy()
@@ -300,10 +300,11 @@ def hard_bot(board, move):
 
     return best_col
 
-def play_again(next):
+def play_again(next, root):
     global next_game
     next_game = next
-    root.destroy
+    root.destroy()
+    
 
 def draw_button(surface, x, y, width, height, text, font, color):
     pygame.draw.rect(surface, color, (x, y, width, height))
@@ -340,19 +341,15 @@ def grid_size(num_row, num_col, cell_size):
     return pygame.Rect(start_x, start_y, width, height)
 
 
-def click_move(cell_size, num_col, board, move):
+def click_move(cell_size, board, move):
     mouse = pygame.mouse.get_pos()
     mouse_x = mouse[0] - 40
-    
-
     column = mouse_x // (cell_size + 10)
     if column > (len(board)) or column < 0 or (board[0][column]) != " ":
         print("Invalid column ")
         return board, move
     else:
-        
         board, move, victory = make_move(board, move, column)
-        
         return board, move, victory, column
 
 def play_again_window():
@@ -361,12 +358,36 @@ def play_again_window():
     root.geometry("350x250")
     label = tk.Label(root, text="Do you want to play again", font=("Arial", 14))
     label.pack(pady=20)
-    btn1 = tk.Button(root, text="Yes", width=10, command=lambda: play_again(True))
+    btn1 = tk.Button(root, text="Yes", width=10, command=lambda: play_again(True, root))
     btn1.pack(pady=5)
-    btn2 = tk.Button(root, text="No", width=10, command=lambda: play_again(False))
+    btn2 = tk.Button(root, text="No", width=10, command=lambda: play_again(False, root))
     btn2.pack(pady=5)
     root.mainloop()
-    root.destroy
+
+
+def game_mode_menu():
+    root = tk.Tk()
+    root.title("Choose game mode")
+    root.geometry("350x250")
+    label = tk.Label(root, text="Chose game mode:", font=("Arial", 14))
+    label.pack(pady=20)
+
+    btn1 = tk.Button(root, text="2 Players", width=10, command=lambda: set_mode("2p", root))
+    btn1.pack(pady=5)
+
+    btn2 = tk.Button(root, text="Easy Bot", width=10, command=lambda: set_mode("easy", root))
+    btn2.pack(pady=5)
+
+    btn3 = tk.Button(root, text="Medium Bot", width=10, command=lambda: set_mode("medium", root))
+    btn3.pack(pady=5)
+
+    btn4 = tk.Button(root, text="Hard Bot", width=10, command=lambda: set_mode("hard", root))
+    btn4.pack(pady=5)
+    root.mainloop()
+
+
+# def main_menu():
+#     while True:
 
 if __name__ == "__main__":
     import random
@@ -381,52 +402,32 @@ if __name__ == "__main__":
 
     board = new_board(num_row)
 
-    root = tk.Tk()
-    root.title("Choose game mode")
-    root.geometry("350x250")
-
-    label = tk.Label(root, text="Chose game mode:", font=("Arial", 14))
-    label.pack(pady=20)
-
-    btn1 = tk.Button(root, text="2 Players", width=10, command=lambda: set_mode("2p"))
-    btn1.pack(pady=5)
-
-    btn2 = tk.Button(root, text="Easy Bot", width=10, command=lambda: set_mode("easy"))
-    btn2.pack(pady=5)
-
-    btn3 = tk.Button(root, text="Medium Bot", width=10, command=lambda: set_mode("medium"))
-    btn3.pack(pady=5)
-
-    btn4 = tk.Button(root, text="Hard Bot", width=10, command=lambda: set_mode("hard"))
-    btn4.pack(pady=5)
-
-    root.mainloop()
+    game_mode_menu()
 
     pause = False
     music_playing = True
-    global move
     move = choose_symbol()
-    bot_id = copy.deepcopy(move)
-    bot_id = (bot_id + 1) % 2
+    bot_id = (copy.deepcopy(move) + 1) % 2
     next_game = True
-    pygame.init()
-    pygame.mixer.init()
-    X, Y = 1280, 720
+    
+    
     white = (255, 255, 255)
     blue = (0, 0, 128)
     gray = (128, 128, 128)
+    X, Y = 1280, 720
+
+    pygame.init()
+    pygame.mixer.init()
     pygame.display.set_caption("Simulation")
     pauza = pygame.image.load("Pauza.png")
     wyjscie = pygame.image.load("Exit.png")
     wyjscie_rect = wyjscie.get_rect(center=(X//2 + 150, Y//2 + 60))
-    dzwiek = pygame.image.load("Sound.png")
-    Nie_dzwiek = pygame.image.load("Not_sound.png")
-    dzwiek_rect = dzwiek.get_rect(center=(X//2 - 150, Y//2 + 60))
     wyjscie_clicked = False
 
     # dzwiek = pygame.image.load("Sound.png")
     # Nie_dzwiek = pygame.image.load("Not_sound.png")
     # dzwiek_rect = dzwiek.get_rect(center=(X//2 - 150, Y//2 + 60))
+    
 
     display_surface = pygame.display.set_mode((X, Y))
     font = pygame.font.Font('freesansbold.ttf', 18)
@@ -434,13 +435,9 @@ if __name__ == "__main__":
     cell_size = calculate_cell_size(Y, num_row)
     grid_rect = grid_size(num_row, num_col, cell_size)
 
-    # pygame.mixer.music.load("muzyka.mp3")
-    # pygame.mixer.music.set_volume(0.5)
-    # pygame.mixer.music.play(-1)
-
-
     blue_circle = pygame.image.load("blue_circle.png").convert_alpha()
     red_circle = pygame.image.load("red_circle.png").convert_alpha()
+
     player_symbol_1 = pygame.transform.smoothscale(blue_circle, (cell_size - 20, cell_size - 20))
     player_symbol_2 = pygame.transform.smoothscale(red_circle, (cell_size - 20, cell_size - 20))
 
@@ -455,8 +452,8 @@ if __name__ == "__main__":
             if event.type == pygame.MOUSEBUTTONDOWN and pause == False:
                 if wyjscie_rect.collidepoint(event.pos) and pause:  
                     wyjscie_clicked = True
-                if grid_rect.collidepoint(event.pos) and move % 2 != bot_id:
-                    board, move, victory, column = click_move(cell_size, num_col, board, move)
+                if grid_rect.collidepoint(event.pos) and move % 2 != bot_id or game_mode == "2p":
+                    board, move, victory, column = click_move(cell_size, board, move)
                     draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                     if victory == True:
                         symbol = get_player_symbol(move)
@@ -484,12 +481,12 @@ if __name__ == "__main__":
                     column = hard_bot(board, move)
                 board, move, victory = make_move(board, move, column) 
                 draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
+
                 if victory == True:
                     symbol = get_player_symbol(move)
                     print(board)
                     print(f'The player {symbol} won!!!')
                 
-                    # Draw final board before stopping
                     display_surface.fill(gray)
                     draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                     pygame.display.flip()
@@ -509,18 +506,16 @@ if __name__ == "__main__":
             pauza_rect = pauza.get_rect(center=(X // 2, Y // 2))
             display_surface.blit(pauza, pauza_rect)
             display_surface.blit(wyjscie, wyjscie_rect)
-            if music_playing:
-                display_surface.blit(dzwiek, dzwiek_rect)
-            else:
-                display_surface.blit(Nie_dzwiek, dzwiek_rect)
 
+            if wyjscie_clicked == True:
+                running = False
             # if music_playing:
             #     display_surface.blit(dzwiek, dzwiek_rect)
             # else:
             #     display_surface.blit(Nie_dzwiek, dzwiek_rect)
 
-            if wyjscie_clicked:
-                running = False
+
+            
 
                 # elif dzwiek_rect.collidepoint(event.pos) and pause: 
                 #     if music_playing:
@@ -532,17 +527,6 @@ if __name__ == "__main__":
 
         pygame.display.flip()
     pygame.quit()
-
-    root = tk.Tk()
-    root.title("Play again")
-    root.geometry("350x250")
-    label = tk.Label(root, text="Do you want to play again", font=("Arial", 14))
-    label.pack(pady=20)
-    btn1 = tk.Button(root, text="Yes", width=10, command=lambda: play_again(True))
-    btn1.pack(pady=5)
-    btn2 = tk.Button(root, text="No", width=10, command=lambda: play_again(False))
-    btn2.pack(pady=5)
-    root.mainloop()
 
     # while next_game == True:
     #     board = new_board(num_row)
