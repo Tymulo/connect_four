@@ -165,75 +165,138 @@ def medium_bot(board, move):
             column = random.randint(0, 6)
     return column
 
-def add_points(board, move):
-    for i in range(7):
-        if board[0][i] == " ":
-            t = copy.deepcopy(board)
-            t, _, victory = make_move(t, move, i)
-            if victory_checker(t, move):
-                return 1
+def evaluate_window(window, symbol):
+    if (symbol == "X"):
+        opp_symbol = "O"
+    else:
+        opp_symbol = "X"
+        
+    score = 0
 
-    for j in range(7):
-        if board[0][j] == " ":
-            d = copy.deepcopy(board)
-            d, _, victory = make_move(d, move + 1, j)
-            if victory_checker(d, move + 1):
-                return -1
+    if window.count(symbol) == 4:        
+        score += 1000
+    elif window.count(symbol) == 3 and window.count(" ") == 1:
+        score += 10                      
+    elif window.count(symbol) == 2 and window.count(" ") == 2:
+        score += 5                      
 
-    return 0
+    if window.count(opp_symbol) == 3 and window.count(" ") == 1:
+        score -= 80                     
+    elif window.count(opp_symbol) == 2 and window.count(" ") == 2:
+        score -= 10 
+
+    return score
 
 
-def min_max(board, move, depth, bot_move):
-    if depth == 0 or victory_checker(board, move):
-        return add_points(board, move)
+def evaluate(board, symbol):
+    score = 0
+    rows = len(board)
+    cols = len(board[0])
 
-    if bot_move % 2 == 0:  
-        best_score = -float("inf")
-        for i in range(7):
-            if board[0][i] == " ":
-                t = copy.deepcopy(board)
-                t, _, victory = make_move(t, move, i)
-                score = min_max(t, move + 1, depth - 1, bot_move + 1)
-                best_score = max(best_score, score)
-        return best_score
-    else:  
-        best_score = float("inf")
-        for i in range(7):
-            if board[0][i] == " ":
-                t = copy.deepcopy(board)
-                t, _, victory = make_move(t, move, i)
-                score = min_max(t, move + 1, depth - 1, bot_move + 1)
-                best_score = min(best_score, score)
-        return best_score
+    center_col = cols // 2
+    center_array = [board[r][center_col] for r in range(rows)]
+    score += center_array.count(symbol) * 6
+    
+    for r in range(rows):
+        for c in range(cols - 3):
+            window = board[r][c:c+4]
+            score += evaluate_window(window, symbol)
+
+    for c in range(cols):
+        for r in range(rows - 3):
+            window = [board[r+i][c] for i in range(4)]  
+            score += evaluate_window(window, symbol)
+
+    for r in range(rows - 3):
+        for c in range(cols - 3):
+            window = [board[r+i][c+i] for i in range(4)]
+            score += evaluate_window(window, symbol)
+
+    for r in range(rows - 3):
+        for c in range(3, cols):
+            window = [board[r+i][c-i] for i in range(4)]
+            score += evaluate_window(window, symbol)
+
+    return score
+
+def is_terminal(board):
+    return (victory_checker(board, 0) or victory_checker(board, 1) or  all(board[0][c] != " " for c in range(7)))
+                                            
+def min_max(board, depth, alpha, beta, maximizing, symbol):
+    valid_moves = [c for c in range(7) if board[0][c] == " "]
+
+    if (symbol == "X"):
+        bot_parity = 1
+    else:
+        bot_parity = 0
+    opp_parity = 1 - bot_parity
+        
+    if depth == 0 or is_terminal(board):
+        return evaluate(board, symbol), None  
+
+    if maximizing:
+        value = -float("inf")  
+        best_col = random.choice(valid_moves)
+        for col in valid_moves:
+            b_copy = copy.deepcopy(board)
+            make_move(b_copy, bot_parity, col)   
+            new_score, _ = min_max(b_copy, depth-1, alpha, beta, False, symbol)
+            if new_score > value:
+                value = new_score
+                best_col = col
+            alpha = max(alpha, value)
+            if alpha >= beta:  
+                break
+        return value, best_col
+
+    else:
+        value = float("inf")  
+        best_col = random.choice(valid_moves)
+        for col in valid_moves:
+            b_copy = copy.deepcopy(board)
+            make_move(b_copy, opp_parity, col)  
+            new_score, _ = min_max(b_copy, depth-1, alpha, beta, True, symbol)
+            if new_score < value:
+                value = new_score
+                best_col = col
+            beta = min(beta, value)
+            if alpha >= beta:  
+                break
+        return value, best_col
 
 
 def hard_bot(board, move):
-    best_score = -float("inf")
-    best_col = None
-    if move <= 4:
-        return random.randint(2, 4)
+    if move<=2:
+        return random.randint(2,4)
     for i in range(7):
         if board[0][i] == " ":
             t = copy.deepcopy(board)
-            t, _, victory = make_move(t, move, i)
+            make_move(t, move, i)
             if victory_checker(t, move):
                 return i
-
     for j in range(7):
         if board[0][j] == " ":
             d = copy.deepcopy(board)
-            d, _, victory = make_move(d, move + 1, j)
+            make_move(d, move + 1, j)
             if victory_checker(d, move + 1):
                 return j
+    symbol = get_player_symbol(move)
+    _, best_col = min_max(board, depth = 6, alpha = -float("inf"), beta = float("inf"), maximizing = True, symbol = symbol)
 
-    for x in range(7):
-        if board[0][x] == " ":
-            t = copy.deepcopy(board)
-            t, _, victory = make_move(t, move, x)
-            score = min_max(t, move + 1, depth=4, bot_move=1)
-            if score > best_score:
-                best_score = score
-                best_col = x
+    for col in range(7):
+        if board[0][col] == " ":
+            tmp = copy.deepcopy(board)
+            make_move(tmp, move, col)
+            for opp_col in range(7):
+                if tmp[0][opp_col] == " ":
+                    tmp2 = copy.deepcopy(tmp)
+                    make_move(tmp2, move + 1, opp_col)
+                    if victory_checker(tmp2, move + 1):
+                        if col == best_col:
+                            valid = [c for c in range(7) if board[0][c] == " " and c != best_col]
+                            if valid:
+                                return random.choice(valid)
+                        break
 
     return best_col
 
@@ -389,7 +452,7 @@ if __name__ == "__main__":
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     pause = not pause
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and pause == False:
                 if wyjscie_rect.collidepoint(event.pos) and pause:  
                     wyjscie_clicked = True
                 if grid_rect.collidepoint(event.pos) and move % 2 != bot_id:
