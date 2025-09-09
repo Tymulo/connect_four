@@ -480,11 +480,14 @@ if __name__ == "__main__":
     wyjscie_rect = wyjscie.get_rect(center=(X//2 + 150, Y//2 + 60))
     wyjscie_clicked = False
 
-    # dzwiek = pygame.image.load("Sound.png")
-    # Nie_dzwiek = pygame.image.load("Not_sound.png")
-    # dzwiek_rect = dzwiek.get_rect(center=(X//2 - 150, Y//2 + 60))
+    dzwiek = pygame.image.load("Sound.png")
+    Nie_dzwiek = pygame.image.load("Not_sound.png")
+    dzwiek_rect = dzwiek.get_rect(center=(X//2 - 150, Y//2 + 60))
+    
+
+    display_surface = pygame.display.set_mode((X, Y))
+    font = pygame.font.Font('freesansbold.ttf', 18)
     button_width, button_height = button_size(X, Y)
-    print(button_width, button_height)
     cell_size = calculate_cell_size(Y, num_row)
     grid_rect = grid_size(num_row, num_col, cell_size)
 
@@ -493,6 +496,9 @@ if __name__ == "__main__":
 
     player_symbol_1 = pygame.transform.smoothscale(blue_circle, (cell_size - 20, cell_size - 20))
     player_symbol_2 = pygame.transform.smoothscale(red_circle, (cell_size - 20, cell_size - 20))
+    pygame.mixer.music.load("muzyka.mp3")
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)
     
     main_menu(X, Y, button_width, button_height, font)
     bot_id = (copy.deepcopy(move) + 1) % 2
@@ -505,8 +511,6 @@ if __name__ == "__main__":
                 if event.key == pygame.K_SPACE:
                     pause = not pause
             if event.type == pygame.MOUSEBUTTONDOWN and pause == False:
-                if wyjscie_rect.collidepoint(event.pos) and pause:  
-                    wyjscie_clicked = True
                 if grid_rect.collidepoint(event.pos) and move % 2 != bot_id or game_mode == "2p":
                     board, move, victory, column = click_move(cell_size, board, move)
                     draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
@@ -524,7 +528,17 @@ if __name__ == "__main__":
                             board = new_board(num_row)
                         else:
                             running = False
-
+            elif event.type == pygame.MOUSEBUTTONDOWN and pause == True:
+                if wyjscie_rect.collidepoint(event.pos) and pause:  
+                    wyjscie_clicked = True
+                elif dzwiek_rect.collidepoint(event.pos) and pause: 
+                    if music_playing:
+                        pygame.mixer.music.pause()
+                        music_playing = False
+                    else:
+                        pygame.mixer.music.unpause()
+                        music_playing = True
+                
 
         if game_mode != "2p":        
             if move % 2 == bot_id:
@@ -561,9 +575,28 @@ if __name__ == "__main__":
             pauza_rect = pauza.get_rect(center=(X // 2, Y // 2))
             display_surface.blit(pauza, pauza_rect)
             display_surface.blit(wyjscie, wyjscie_rect)
-
+            if music_playing:
+                display_surface.blit(dzwiek, dzwiek_rect)
+            else:
+               display_surface.blit(Nie_dzwiek, dzwiek_rect)
+               
             if wyjscie_clicked == True:
                 running = False
+            # if music_playing:
+            #     display_surface.blit(dzwiek, dzwiek_rect)
+            # else:
+            #     display_surface.blit(Nie_dzwiek, dzwiek_rect)
+
+
+            
+
+                # elif dzwiek_rect.collidepoint(event.pos) and pause: 
+                #     if music_playing:
+                #         pygame.mixer.music.pause()
+                #         music_playing = False
+                #     else:
+                #         pygame.mixer.music.unpause()
+                #         music_playing = True
 
         pygame.display.flip()
     pygame.quit()
