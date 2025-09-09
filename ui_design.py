@@ -100,6 +100,7 @@ while running:
     display_surface.fill(gray)
     draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
     pygame.draw.rect(display_surface, blue, grid_rect)
+    
     if pause == True:
         pauza_rect = pauza.get_rect(center=(X // 2, Y // 2))
         display_surface.blit(pauza, pauza_rect)

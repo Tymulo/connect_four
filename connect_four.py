@@ -306,13 +306,6 @@ def play_again(next, root):
     root.destroy()
     
 
-def draw_button(surface, x, y, width, height, text, font, color):
-    pygame.draw.rect(surface, color, (x, y, width, height))
-    text_surface = font.render(text, True, (0, 0, 0))
-    text_rect = text_surface.get_rect(center=(x + width // 2, y + height // 2))
-    surface.blit(text_surface, text_rect)
-
-
 def calculate_cell_size(Y, num_row):
     y = (Y // num_row) - 20
     return y
@@ -386,8 +379,69 @@ def game_mode_menu():
     root.mainloop()
 
 
-# def main_menu():
-#     while True:
+def button_size(X, Y):
+    button_ratio = [4,2]
+    button_width = (X * 0.2) * button_ratio[0] / (button_ratio[0] + button_ratio[1])
+    button_height = (Y * 0.2) * button_ratio[1] / (button_ratio[0] + button_ratio[1])
+    return int(button_width), int(button_height)
+
+
+def main_menu(X, Y, button_width, button_height , font):
+    pygame.display.set_caption("Play")
+    display_surface = pygame.display.set_mode((X, Y))
+    running = True
+    while running: 
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_play_rect.collidepoint(event.pos):
+                    play_menu()
+                    running = False
+
+        display_surface.fill(gray)
+        
+        button_play_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Play", font, (34,34,34))
+        but_2 = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Options", font, (34,34,34))
+        but_3 = draw_button(display_surface, X//2, Y//2 + button_height + 10, button_width, button_height, "Exit", font, (34,34,34))
+        
+        pygame.display.flip()
+    pygame.quit
+
+def draw_button(surface, x, y, width, height, text, font, color):
+    button_rect = pygame.Rect(0, 0, width, height)
+    button_rect.center = (x, y)
+    pygame.draw.rect(surface, color, button_rect)
+    text_surface = font.render(text, True, (255, 255, 255))
+    text_rect = text_surface.get_rect(center=button_rect.center)
+    surface.blit(text_surface, text_rect)
+    return button_rect
+
+
+def play_menu():
+    global move
+    pygame.display.set_caption("Play")
+    display_surface = pygame.display.set_mode((X, Y))
+    running = True
+    while running: 
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_red.collidepoint(event.pos):
+                    move = 0
+                    running = False
+                    game_mode_menu()
+                    
+                if button_blue.collidepoint(event.pos):
+                    move = 1
+                    running = False
+                    game_mode_menu()
+        display_surface.fill(gray)
+        button_blue = draw_button(display_surface, X//2 + button_width + 10, Y//2 , button_width, button_height, "Blue", font, (34,34,34))
+        button_red = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Red", font, (34,34,34))
+        pygame.display.flip()
+    pygame.quit
 
 if __name__ == "__main__":
     import random
@@ -402,12 +456,9 @@ if __name__ == "__main__":
 
     board = new_board(num_row)
 
-    game_mode_menu()
-
     pause = False
     music_playing = True
-    move = choose_symbol()
-    bot_id = (copy.deepcopy(move) + 1) % 2
+    
     next_game = True
     
     
@@ -418,20 +469,22 @@ if __name__ == "__main__":
 
     pygame.init()
     pygame.mixer.init()
-    pygame.display.set_caption("Simulation")
+
+
+    pygame.display.set_caption("Play")
     pauza = pygame.image.load("Pauza.png")
     wyjscie = pygame.image.load("Exit.png")
+    display_surface = pygame.display.set_mode((X, Y))
+    font = pygame.font.Font('freesansbold.ttf', 18)
+
     wyjscie_rect = wyjscie.get_rect(center=(X//2 + 150, Y//2 + 60))
     wyjscie_clicked = False
 
     # dzwiek = pygame.image.load("Sound.png")
     # Nie_dzwiek = pygame.image.load("Not_sound.png")
     # dzwiek_rect = dzwiek.get_rect(center=(X//2 - 150, Y//2 + 60))
-    
-
-    display_surface = pygame.display.set_mode((X, Y))
-    font = pygame.font.Font('freesansbold.ttf', 18)
-
+    button_width, button_height = button_size(X, Y)
+    print(button_width, button_height)
     cell_size = calculate_cell_size(Y, num_row)
     grid_rect = grid_size(num_row, num_col, cell_size)
 
@@ -440,7 +493,9 @@ if __name__ == "__main__":
 
     player_symbol_1 = pygame.transform.smoothscale(blue_circle, (cell_size - 20, cell_size - 20))
     player_symbol_2 = pygame.transform.smoothscale(red_circle, (cell_size - 20, cell_size - 20))
-
+    
+    main_menu(X, Y, button_width, button_height, font)
+    bot_id = (copy.deepcopy(move) + 1) % 2
     running = True
     while running: 
         for event in pygame.event.get():
@@ -509,58 +564,6 @@ if __name__ == "__main__":
 
             if wyjscie_clicked == True:
                 running = False
-            # if music_playing:
-            #     display_surface.blit(dzwiek, dzwiek_rect)
-            # else:
-            #     display_surface.blit(Nie_dzwiek, dzwiek_rect)
-
-
-            
-
-                # elif dzwiek_rect.collidepoint(event.pos) and pause: 
-                #     if music_playing:
-                #         pygame.mixer.music.pause()
-                #         music_playing = False
-                #     else:
-                #         pygame.mixer.music.unpause()
-                #         music_playing = True
 
         pygame.display.flip()
     pygame.quit()
-
-    # while next_game == True:
-    #     board = new_board(num_row)
-    #     print_board(board, move)
-    #     victory = False
-    #     if game_mode != "2p":
-    #         while victory != True:
-    #             symbol = get_player_symbol(move)
-    #             print(f'Player {symbol} move')
-    #             if move % 2 == bot_id:
-    #                 if game_mode == "easy":
-    #                     column = bot_easy(board, column, move)
-    #                 if game_mode == "medium":
-    #                     column = medium_bot(board, move)
-    #                 if game_mode == "hard":
-    #                     column = hard_bot(board, move)
-    #             else:
-    #                 column = player_input(board)
-    #             make_move(board, move, column)
-    #             print_board(board, move)
-    #             victory = victory_checker(board, move)
-    #             move += 1
-    #     else:
-    #         while victory != True:
-    #             symbol = get_player_symbol(move)
-    #             print(f'Player {symbol} move')
-    #             column = player_input(board)
-    #             make_move(board, move, column)
-    #             print_board(board, move)
-    #             victory = victory_checker(board, move)
-    #             move += 1
-    #     print(board)
-    #     print(f'The player {symbol} won!!!')
-
-    
-
-       
