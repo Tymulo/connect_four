@@ -523,11 +523,22 @@ if __name__ == "__main__":
                         draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                         pygame.display.flip()
 
-                        play_again_window()
                         if next_game == True:
                             board = new_board(num_row)
+                            move = 0
                         else:
                             running = False
+                        play_again_window()
+                    elif victory == False and move>41:
+                        print("Draw")
+                        play_again_window()
+                        
+                        if next_game == True:
+                            board = new_board(num_row)
+                            move = 0
+                        else:
+                            running = False
+                            
             elif event.type == pygame.MOUSEBUTTONDOWN and pause == True:
                 if wyjscie_rect.collidepoint(event.pos) and pause:  
                     wyjscie_clicked = True
@@ -563,8 +574,18 @@ if __name__ == "__main__":
                     play_again_window()
                     if next_game == True:
                         board = new_board(num_row)
+                        move = 0
                     else:
                         running = False
+                elif victory == False and move>41:
+                        print("Draw")
+                        play_again_window()
+                        
+                        if next_game == True:
+                            board = new_board(num_row)
+                            move = 0
+                        else:
+                            running = False
                 
 
         display_surface.fill(gray)
@@ -582,21 +603,7 @@ if __name__ == "__main__":
                
             if wyjscie_clicked == True:
                 running = False
-            # if music_playing:
-            #     display_surface.blit(dzwiek, dzwiek_rect)
-            # else:
-            #     display_surface.blit(Nie_dzwiek, dzwiek_rect)
-
-
             
-
-                # elif dzwiek_rect.collidepoint(event.pos) and pause: 
-                #     if music_playing:
-                #         pygame.mixer.music.pause()
-                #         music_playing = False
-                #     else:
-                #         pygame.mixer.music.unpause()
-                #         music_playing = True
 
         pygame.display.flip()
     pygame.quit()
