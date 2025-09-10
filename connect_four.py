@@ -389,6 +389,7 @@ def button_size(X, Y):
 def main_menu(X, Y, button_width, button_height , font):
     pygame.display.set_caption("Play")
     display_surface = pygame.display.set_mode((X, Y))
+    music_playing = False
     running = True
     while running: 
         for event in pygame.event.get():
@@ -398,11 +399,12 @@ def main_menu(X, Y, button_width, button_height , font):
                 if button_play_rect.collidepoint(event.pos):
                     play_menu()
                     running = False
+                if options_button.collidepoint(event.pos):
+                    options_menu(music_playing, X, Y, button_width, button_height , font)
 
         display_surface.fill(gray)
-        
         button_play_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Play", font, (34,34,34))
-        but_2 = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Options", font, (34,34,34))
+        options_button = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Options", font, (34,34,34))
         but_3 = draw_button(display_surface, X//2, Y//2 + button_height + 10, button_width, button_height, "Exit", font, (34,34,34))
         
         pygame.display.flip()
@@ -443,6 +445,36 @@ def play_menu():
         pygame.display.flip()
     pygame.quit
 
+
+def options_menu(music_playing, X, Y, button_width, button_height , font):
+    pygame.display.set_caption("Options")
+    display_surface = pygame.display.set_mode((X, Y))
+    running = True
+    while running: 
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_music_rect.collidepoint(event.pos):
+                    if music_playing == True:
+                        pygame.mixer.music.pause()
+                        music_playing = False
+                    else:
+                        pygame.mixer.music.unpause()
+                        music_playing = True
+                if back_button.collidepoint(event.pos):
+                    running = False
+                    main_menu(X, Y, button_width, button_height , font)
+
+        display_surface.fill(gray)
+        if music_playing == False:
+            button_music_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Music", font, red)
+        if music_playing == True:
+            button_music_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Music", font, green)
+        back_button = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Back", font, (34,34,34))
+        
+        pygame.display.flip()
+    pygame.quit
 if __name__ == "__main__":
     import random
     import tkinter as tk
@@ -465,6 +497,8 @@ if __name__ == "__main__":
     white = (255, 255, 255)
     blue = (0, 0, 128)
     gray = (128, 128, 128)
+    green = (0, 128, 0)
+    red = (255,0,0)
     X, Y = 1280, 720
 
     pygame.init()
@@ -480,10 +514,12 @@ if __name__ == "__main__":
     wyjscie_rect = wyjscie.get_rect(center=(X//2 + 150, Y//2 + 60))
     wyjscie_clicked = False
 
-    dzwiek = pygame.image.load("Sound.png")
-    Nie_dzwiek = pygame.image.load("Not_sound.png")
-    dzwiek_rect = dzwiek.get_rect(center=(X//2 - 150, Y//2 + 60))
-    
+    # dzwiek = pygame.image.load("Sound.png")
+    # Nie_dzwiek = pygame.image.load("Not_sound.png")
+    # dzwiek_rect = dzwiek.get_rect(center=(X//2 - 150, Y//2 + 60))
+    pygame.mixer.music.load("muzyka.mp3")
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)
 
     display_surface = pygame.display.set_mode((X, Y))
     font = pygame.font.Font('freesansbold.ttf', 18)
@@ -496,9 +532,7 @@ if __name__ == "__main__":
 
     player_symbol_1 = pygame.transform.smoothscale(blue_circle, (cell_size - 20, cell_size - 20))
     player_symbol_2 = pygame.transform.smoothscale(red_circle, (cell_size - 20, cell_size - 20))
-    pygame.mixer.music.load("muzyka.mp3")
-    pygame.mixer.music.set_volume(0.5)
-    pygame.mixer.music.play(-1)
+
     
     main_menu(X, Y, button_width, button_height, font)
     bot_id = (copy.deepcopy(move) + 1) % 2
@@ -569,7 +603,6 @@ if __name__ == "__main__":
 
         display_surface.fill(gray)
         draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
-        
         
         if pause == True:
             pauza_rect = pauza.get_rect(center=(X // 2, Y // 2))
