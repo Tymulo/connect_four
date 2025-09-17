@@ -395,7 +395,7 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x)
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if button_play.collidepoint(event.pos):
+                if button_play_rect.collidepoint(event.pos):
                     play_menu()
                     running = False
                 if options_button.collidepoint(event.pos):
@@ -403,9 +403,10 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x)
                 #if but_3.collidepoint(event.pos):
                    # running = False
         display_surface.fill(gray)
-        button_play = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Play", font, (34,34,34))
+        button_play_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Play", font, (34,34,34))
         options_button = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Options", font, (34,34,34))
-        exit_button = draw_button(display_surface, X//2, Y//2 + button_height + 10, button_width, button_height, "Exit", font, (34,34,34))
+        rules_button = draw_button(display_surface, X//2, Y//2 + button_height + 10, button_width, button_height, "Rules", font, (34,34,34))
+        but_3 = draw_button(display_surface, X//2, Y//2 + 2*button_height + 20, button_width, button_height, "Exit", font, (34,34,34))
         
         pygame.display.flip()
     pygame.quit
