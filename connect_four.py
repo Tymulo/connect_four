@@ -396,7 +396,7 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x)
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button_play_rect.collidepoint(event.pos):
-                    play_menu()
+                    play_menu(circle_x)
                     running = False
                 if options_button.collidepoint(event.pos):
                     circle_x = options_menu(music_playing, X, Y, button_width, button_height , font, circle_x)
@@ -421,7 +421,7 @@ def draw_button(surface, x, y, width, height, text, font, color):
     return button_rect
 
 
-def play_menu():
+def play_menu(circle_x):
     global move
     pygame.display.set_caption("Play")
     display_surface = pygame.display.set_mode((X, Y))
@@ -440,9 +440,13 @@ def play_menu():
                     move = 1
                     running = False
                     game_mode_menu()
+                if back_button.collidepoint(event.pos):
+                    running = False
+                    main_menu(X, Y, button_width, button_height , font, music_playing, circle_x)
         display_surface.fill(gray)
-        button_blue = draw_button(display_surface, X//2 + button_width + 10, Y//2 , button_width, button_height, "Blue", font, (34,34,34))
+        button_blue = draw_button(display_surface, X//2 - button_width - 10, Y//2 , button_width, button_height, "Blue", font, (34,34,34))
         button_red = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Red", font, (34,34,34))
+        back_button = draw_button(display_surface, X//2 + button_width + 10, Y//2, button_width, button_height, "Back", font, (34,34,34))
         pygame.display.flip()
     pygame.quit
 
