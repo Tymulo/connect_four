@@ -386,9 +386,12 @@ def button_size(X, Y):
     return int(button_width), int(button_height)
 
 
-def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x):
+def main_menu(X, Y, button_width, button_height , font):
     pygame.display.set_caption("Play")
     display_surface = pygame.display.set_mode((X, Y))
+    music_playing = False
+    if music_playing == False:
+        pygame.mixer.music.pause()
     running = True
     while running: 
         for event in pygame.event.get():
@@ -399,9 +402,11 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x)
                     play_menu()
                     running = False
                 if options_button.collidepoint(event.pos):
-                    circle_x = options_menu(music_playing, X, Y, button_width, button_height , font, circle_x)
-                #if but_3.collidepoint(event.pos):
-                   # running = False
+                    options_menu(music_playing, X, Y, button_width, button_height , font)
+                if exit_button.collidepoint(event.pos):
+                    running = False
+                    pygame.QUIT
+
         display_surface.fill(gray)
         button_play = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Play", font, (34,34,34))
         options_button = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Options", font, (34,34,34))
@@ -446,29 +451,15 @@ def play_menu():
     pygame.quit
 
 
-def options_menu(music_playing, X, Y, button_width, button_height , font, circle_x):
+def options_menu(music_playing, X, Y, button_width, button_height , font):
     pygame.display.set_caption("Options")
     display_surface = pygame.display.set_mode((X, Y))
-    white = (255, 255, 255)
-    x = 320
-    y = 180
     running = True
-    
-    circle = pygame.image.load("sound_icon.png")
-    kk = circle.get_at((0,0))
-    circle.set_colorkey(kk)
-    circle_y = y + 2 - circle.get_height()/2
-    circle_rect = circle.get_rect(center=(circle_x,y))
-
-    dragging = False
-    
     while running: 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if circle_rect.collidepoint(event.pos):
-                    dragging = True
                 if button_music_rect.collidepoint(event.pos):
                     if music_playing == True:
                         pygame.mixer.music.pause()
@@ -478,32 +469,14 @@ def options_menu(music_playing, X, Y, button_width, button_height , font, circle
                         music_playing = True
                 if back_button.collidepoint(event.pos):
                     running = False
-                    main_menu(X, Y, button_width, button_height , font, music_playing, circle_x = circle_rect.centerx)
-                    
-            if event.type == pygame.MOUSEBUTTONUP:
-                dragging = False
+                    main_menu(X, Y, button_width, button_height , font)
 
-            if event.type == pygame.MOUSEMOTION and dragging:
-                mouse_x = event.pos[0]
-                if mouse_x < 320:
-                    circle_rect.centerx = 320
-                elif mouse_x > 960:
-                    circle_rect.centerx = 960
-                else:
-                    circle_rect.centerx = mouse_x
-                    
         display_surface.fill(gray)
         if music_playing == False:
             button_music_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Music", font, red)
         if music_playing == True:
             button_music_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Music", font, green)
         back_button = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Back", font, (34,34,34))
-        pygame.draw.rect(display_surface, white, (x, y, 640, 10))
-        display_surface.blit(circle, circle_rect)
-
-        sound = circle_rect.centerx - 320   
-        volume = sound / (960 - 320)
-        pygame.mixer.music.set_volume(volume)
         
         pygame.display.flip()
     pygame.quit
@@ -566,7 +539,7 @@ if __name__ == "__main__":
     player_symbol_2 = pygame.transform.smoothscale(red_circle, (cell_size - 20, cell_size - 20))
 
     
-    main_menu(X, Y, button_width, button_height, font, music_playing, circle_x = 640)
+    main_menu(X, Y, button_width, button_height, font)
     bot_id = (copy.deepcopy(move) + 1) % 2
     running = True
     while running: 
@@ -606,9 +579,9 @@ if __name__ == "__main__":
                             running = False
                             
             elif event.type == pygame.MOUSEBUTTONDOWN and pause == True:
-                if wyjscie_rect.collidepoint(event.pos):  
+                if wyjscie_rect.collidepoint(event.pos) and pause:  
                     wyjscie_clicked = True
-                elif dzwiek_rect.collidepoint(event.pos): 
+                elif dzwiek_rect.collidepoint(event.pos) and pause: 
                     if music_playing:
                         pygame.mixer.music.pause()
                         music_playing = False
