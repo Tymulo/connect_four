@@ -402,11 +402,11 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x,
     
     while running:
         display_surface.fill(screen_color)
+        display_surface.blit(connect, connect_rect)
         button_play_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Play", font, (34,34,34))
         options_button = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Options", font, (34,34,34))
         rules_button = draw_button(display_surface, X//2, Y//2 + button_height + 10, button_width, button_height, "Rules", font, (34,34,34))
-        but_3 = draw_button(display_surface, X//2, Y//2 + 2*button_height + 20, button_width, button_height, "Exit", font, (34,34,34))
-        display_surface.blit(connect, connect_rect)
+        exit_button = draw_button(display_surface, X//2, Y//2 + 2*button_height + 20, button_width, button_height, "Exit", font, (34,34,34))
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -418,23 +418,18 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x,
                         pass  
                     elif result == "play":
                         game_mode_menu()
-                        running = False
-                        result = play(move, screen_color)
-                        if result == "back":
-                            pass  
-                        elif result == "play":
-                            game_mode_menu()
-                            running = False
+                        result_p = play(move, screen_color)
+                        if result_p == "back":
+                            pass
 
                 if options_button.collidepoint(event.pos):
                     circle_x, result, screen_color = options_menu(music_playing, X, Y, button_width, button_height , font, circle_x, screen_color)
                     if result == "back":
                         pass  
-                if but_3.collidepoint(event.pos):
+                if exit_button.collidepoint(event.pos):
                     running = False
-                    pygame.quit()
-        
-        
+                    sys.exit()
+
         pygame.display.flip()
     pygame.quit()
 
@@ -597,6 +592,7 @@ def options_menu(music_playing, X, Y, button_width, button_height , font, circle
 
 def play(move, screen_color):
     display_surface = pygame.display.set_mode((X, Y))
+    pygame.display.set_caption("Connect")
     font = pygame.font.Font('freesansbold.ttf', 18)
     button_width, button_height = button_size(X, Y)
     cell_size = calculate_cell_size(Y, num_row)
@@ -610,6 +606,7 @@ def play(move, screen_color):
     
     board = new_board(num_row)
     bot_id = (copy.deepcopy(move) + 1) % 2
+    next_game = False
     pause = False
     music_playing = True
     running = True
@@ -626,20 +623,16 @@ def play(move, screen_color):
                     board, move, victory, column = click_move(cell_size, board, move)
                     draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                     if victory == True:
-                        symbol = get_player_symbol(move)
-                        print(board)
-                        print(f'The player {symbol} won!!!')
-
-                        display_surface.fill(screen_color)
-                        draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                         pygame.display.flip()
 
+                        play_again_window()
                         if next_game == True:
                             board = new_board(num_row)
                             move = 0
                         else:
                             running = False
-                        play_again_window()
+                            return "back"
+                        
                     elif victory == False and draw_checker(board):
                         print("Draw")
                         play_again_window()
@@ -649,6 +642,7 @@ def play(move, screen_color):
                             move = 0
                         else:
                             running = False
+                            return "back"
                             
             elif event.type == pygame.MOUSEBUTTONDOWN and pause == True:
                 if wyjscie_rect.collidepoint(event.pos):  
@@ -660,7 +654,6 @@ def play(move, screen_color):
                     else:
                         pygame.mixer.music.unpause()
                         music_playing = True
-                
 
         if game_mode != "2p":        
             if move % 2 == bot_id:
@@ -674,12 +667,6 @@ def play(move, screen_color):
                 draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
 
                 if victory == True:
-                    symbol = get_player_symbol(move)
-                    print(board)
-                    print(f'The player {symbol} won!!!')
-                
-                    display_surface.fill(screen_color)
-                    draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                     pygame.display.flip()
 
                     play_again_window()
@@ -688,6 +675,8 @@ def play(move, screen_color):
                         move = 0
                     else:
                         running = False
+                        return "back"
+                    
                 elif victory == False and draw_checker(board):
                         print("Draw")
                         play_again_window()
@@ -697,6 +686,7 @@ def play(move, screen_color):
                             move = 0
                         else:
                             running = False
+                            return "back"
                 
 
         display_surface.fill(screen_color)
@@ -717,14 +707,14 @@ def play(move, screen_color):
 
         pygame.display.flip()
     pygame.quit()
-    running = False
-    return "back"
+    
     
 if __name__ == "__main__":
     import random
     import tkinter as tk
     import copy
     import pygame
+    import sys
 
     game_mode = None
 
@@ -734,9 +724,7 @@ if __name__ == "__main__":
     board = new_board(num_row)
 
     pause = False
-    music_playing = True
-    
-    next_game = True
+    music_playing = False
     
     screen_color = (99, 203, 237)
     white = (255, 255, 255)
@@ -748,8 +736,6 @@ if __name__ == "__main__":
 
     pygame.init()
     pygame.mixer.init()
-
-
     pygame.display.set_caption("Play")
     pauza = pygame.image.load("Pauza.png")
     wyjscie = pygame.image.load("Exit.png")
@@ -780,8 +766,6 @@ if __name__ == "__main__":
 
     
     main_menu(X, Y, button_width, button_height, font, music_playing, 640, screen_color)
-
-
 
     # bot_id = (copy.deepcopy(move) + 1) % 2
     # running = True
