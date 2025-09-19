@@ -36,6 +36,7 @@ def make_move(board, move, column):
             board[i-1][column] = symbol
             victory = victory_checker(board, move)
             if victory == True:
+                move += 1
                 return board, move, victory
             else:
                 move += 1
@@ -44,6 +45,7 @@ def make_move(board, move, column):
             board[i][column] = symbol
             victory = victory_checker(board, move)
             if victory == True:
+                move += 1
                 return board, move, victory
             else:
                 move += 1
@@ -107,7 +109,11 @@ def victory_checker(board, move):
         return True
     else:
         return False
-
+def draw_checker(board):
+    if all(board[0][c] != " " for c in range(7)):
+        return True
+    else:
+        return False
 
 def set_mode(mode, root):
     global game_mode
@@ -386,29 +392,34 @@ def button_size(X, Y):
     return int(button_width), int(button_height)
 
 
-def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x):
+def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x, screen_color):
     pygame.display.set_caption("Play")
     display_surface = pygame.display.set_mode((X, Y))
     running = True
+
+    connect = pygame.image.load("Connect.png")
+    connect_rect = connect.get_rect(center=(X//2, Y//4))
+    
     while running:
-        display_surface.fill(gray)
+        display_surface.fill(screen_color)
         button_play_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Play", font, (34,34,34))
         options_button = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Options", font, (34,34,34))
         rules_button = draw_button(display_surface, X//2, Y//2 + button_height + 10, button_width, button_height, "Rules", font, (34,34,34))
         but_3 = draw_button(display_surface, X//2, Y//2 + 2*button_height + 20, button_width, button_height, "Exit", font, (34,34,34))
+        display_surface.blit(connect, connect_rect)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button_play_rect.collidepoint(event.pos):
-                    result = play_menu(X, Y, button_width, button_height, font, music_playing, circle_x)
+                    result = play_menu(X, Y, button_width, button_height, font, music_playing, circle_x, screen_color)
                     if result == "back":
                         pass  
                     elif result == "play":
                         game_mode_menu()
                         running = False
-                        result = play(move)
+                        result = play(move, screen_color)
                         if result == "back":
                             pass  
                         elif result == "play":
@@ -416,15 +427,16 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x)
                             running = False
 
                 if options_button.collidepoint(event.pos):
-                    circle_x, result = options_menu(music_playing, X, Y, button_width, button_height , font, circle_x)
+                    circle_x, result, screen_color = options_menu(music_playing, X, Y, button_width, button_height , font, circle_x, screen_color)
                     if result == "back":
                         pass  
-                #if but_3.collidepoint(event.pos):
-                   # running = False
+                if but_3.collidepoint(event.pos):
+                    running = False
+                    pygame.quit()
         
         
         pygame.display.flip()
-    pygame.quit
+    pygame.quit()
 
 def draw_button(surface, x, y, width, height, text, font, color):
     button_rect = pygame.Rect(0, 0, width, height)
@@ -436,7 +448,7 @@ def draw_button(surface, x, y, width, height, text, font, color):
     return button_rect
 
 
-def play_menu(X, Y, button_width, button_height, font, music_playing, circle_x):
+def play_menu(X, Y, button_width, button_height, font, music_playing, circle_x, screen_color):
     global move
     pygame.display.set_caption("Play")
     display_surface = pygame.display.set_mode((X, Y))
@@ -453,7 +465,7 @@ def play_menu(X, Y, button_width, button_height, font, music_playing, circle_x):
     blue_rect = blue_selected.get_rect(center=(X//2 - button_width - 20, Y//2))
     
     while running: 
-        display_surface.fill(gray)
+        display_surface.fill(screen_color)
 
         if color_1 == True:
             display_surface.blit(red_unselected, red_rect)
@@ -491,10 +503,16 @@ def play_menu(X, Y, button_width, button_height, font, music_playing, circle_x):
     return None
 
 
-def options_menu(music_playing, X, Y, button_width, button_height , font, circle_x):
+def options_menu(music_playing, X, Y, button_width, button_height , font, circle_x, screen_color):
     pygame.display.set_caption("Options")
     display_surface = pygame.display.set_mode((X, Y))
     white = (255, 255, 255)
+    cyan = (99, 203, 237)
+    green = (96, 223, 96)
+    yellow = (233, 233, 99)
+    pink = (247, 146, 161)
+    purple = (118, 10, 183)
+    gray = (128, 128, 128)
     x = 320
     y = 180
     running = True
@@ -522,7 +540,18 @@ def options_menu(music_playing, X, Y, button_width, button_height , font, circle
                         music_playing = True
                 if back_button.collidepoint(event.pos):
                     running = False
-                    return circle_rect.centerx, "back"
+                    return circle_rect.centerx, "back", screen_color
+                
+                if cyan_button.collidepoint(event.pos):
+                    screen_color = cyan
+                if green_button.collidepoint(event.pos):
+                    screen_color = green
+                if purple_button.collidepoint(event.pos):
+                    screen_color = purple
+                if pink_button.collidepoint(event.pos):
+                    screen_color = pink
+                if yellow_button.collidepoint(event.pos):
+                    screen_color = yellow
                 
             if event.type == pygame.MOUSEBUTTONUP:
                 dragging = False
@@ -536,15 +565,26 @@ def options_menu(music_playing, X, Y, button_width, button_height , font, circle
                 else:
                     circle_rect.centerx = mouse_x
                     
-        display_surface.fill(gray)
+        display_surface.fill(screen_color)
         if music_playing == False:
             button_music_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Music", font, red)
         if music_playing == True:
-            button_music_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Music", font, green)
+            button_music_rect = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "Music", font, (0, 128, 0))
 
         back_button = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Back", font, (34,34,34))
         pygame.draw.rect(display_surface, white, (x, y, 640, 10))
         display_surface.blit(circle, circle_rect)
+        
+        b1 = draw_button(display_surface, X//2, Y//2 + button_height + 15, 50, 50, " ", font, gray)
+        cyan_button = draw_button(display_surface, X//2, Y//2 + button_height + 15, 45, 45, " ", font, cyan)
+        b2 = draw_button(display_surface, X//2 - 60, Y//2 + button_height + 15, 50, 50, " ", font, gray)
+        green_button = draw_button(display_surface, X//2 - 60, Y//2 + button_height + 15, 45, 45, " ", font, green)
+        b3 = draw_button(display_surface,  X//2 - 120, Y//2 + button_height + 15, 50, 50, " ", font, gray)
+        purple_button = draw_button(display_surface, X//2 - 120, Y//2 + button_height + 15, 45, 45, " ", font, purple)
+        b4 = draw_button(display_surface,  X//2 + 60, Y//2 + button_height + 15, 50, 50, " ", font, gray)
+        pink_button = draw_button(display_surface, X//2 + 60, Y//2 + button_height + 15, 45, 45, " ", font, pink)
+        b5 = draw_button(display_surface, X//2 + 120, Y//2 + button_height + 15, 50, 50, " ", font, gray)
+        yellow_button = draw_button(display_surface, X//2 + 120, Y//2 + button_height + 15, 45, 45, " ", font, yellow)
 
         sound = circle_rect.centerx - 320   
         volume = sound / (960 - 320)
@@ -552,10 +592,10 @@ def options_menu(music_playing, X, Y, button_width, button_height , font, circle
         
         pygame.display.flip()
     pygame.quit()
-    return circle_rect.centerx, None
+    return circle_rect.centerx, None, screen_color
 
 
-def play(move):
+def play(move, screen_color):
     display_surface = pygame.display.set_mode((X, Y))
     font = pygame.font.Font('freesansbold.ttf', 18)
     button_width, button_height = button_size(X, Y)
@@ -590,7 +630,7 @@ def play(move):
                         print(board)
                         print(f'The player {symbol} won!!!')
 
-                        display_surface.fill(gray)
+                        display_surface.fill(screen_color)
                         draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                         pygame.display.flip()
 
@@ -600,7 +640,7 @@ def play(move):
                         else:
                             running = False
                         play_again_window()
-                    elif victory == False and move>41:
+                    elif victory == False and draw_checker(board):
                         print("Draw")
                         play_again_window()
                         
@@ -638,7 +678,7 @@ def play(move):
                     print(board)
                     print(f'The player {symbol} won!!!')
                 
-                    display_surface.fill(gray)
+                    display_surface.fill(screen_color)
                     draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
                     pygame.display.flip()
 
@@ -648,7 +688,7 @@ def play(move):
                         move = 0
                     else:
                         running = False
-                elif victory == False and move>41:
+                elif victory == False and draw_checker(board):
                         print("Draw")
                         play_again_window()
                         
@@ -659,7 +699,7 @@ def play(move):
                             running = False
                 
 
-        display_surface.fill(gray)
+        display_surface.fill(screen_color)
         draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
         
         if pause == True:
@@ -698,7 +738,7 @@ if __name__ == "__main__":
     
     next_game = True
     
-    
+    screen_color = (99, 203, 237)
     white = (255, 255, 255)
     blue = (0, 0, 128)
     gray = (128, 128, 128)
@@ -739,7 +779,7 @@ if __name__ == "__main__":
     player_symbol_2 = pygame.transform.smoothscale(red_circle, (cell_size - 20, cell_size - 20))
 
     
-    main_menu(X, Y, button_width, button_height, font, music_playing, circle_x = 640)
+    main_menu(X, Y, button_width, button_height, font, music_playing, 640, screen_color)
 
 
 
