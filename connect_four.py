@@ -427,8 +427,9 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x,
                     if result == "back":
                         pass  
                 if exit_button.collidepoint(event.pos):
-                    running = False
+                    pygame.quit()
                     sys.exit()
+                    running = False
 
         pygame.display.flip()
     pygame.quit()
@@ -594,21 +595,25 @@ def play(move, screen_color):
     display_surface = pygame.display.set_mode((X, Y))
     pygame.display.set_caption("Connect")
     font = pygame.font.Font('freesansbold.ttf', 18)
+    text_font = pygame.font.Font(None, 74)
     button_width, button_height = button_size(X, Y)
     cell_size = calculate_cell_size(Y, num_row)
     grid_rect = grid_size(num_row, num_col, cell_size)
+    text = text_font.render("Move: ", True, white)
 
     blue_circle = pygame.image.load("blue_circle.png").convert_alpha()
     red_circle = pygame.image.load("red_circle.png").convert_alpha()
 
     player_symbol_1 = pygame.transform.smoothscale(blue_circle, (cell_size - 20, cell_size - 20))
     player_symbol_2 = pygame.transform.smoothscale(red_circle, (cell_size - 20, cell_size - 20))
+    circle_rect = player_symbol_1.get_rect(center=(3*X//4 + 200, Y//2+20))
     
     board = new_board(num_row)
     bot_id = (copy.deepcopy(move) + 1) % 2
     next_game = False
     pause = False
     music_playing = True
+    wyjscie_clicked = False
     running = True
 
     while running: 
@@ -687,10 +692,14 @@ def play(move, screen_color):
                         else:
                             running = False
                             return "back"
-                
 
         display_surface.fill(screen_color)
         draw_grid(display_surface, cell_size, white, num_row, num_col, player_symbol_1, player_symbol_2, board)
+        display_surface.blit(text, (3*X//4, Y//2))
+        if move%2 == 0:
+            display_surface.blit(player_symbol_1,circle_rect)
+        else:
+            display_surface.blit(player_symbol_2,circle_rect)
         
         if pause == True:
             pauza_rect = pauza.get_rect(center=(X // 2, Y // 2))
@@ -724,7 +733,7 @@ if __name__ == "__main__":
     board = new_board(num_row)
 
     pause = False
-    music_playing = False
+    music_playing = True
     
     screen_color = (99, 203, 237)
     white = (255, 255, 255)
