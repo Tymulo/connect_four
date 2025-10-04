@@ -351,19 +351,6 @@ def click_move(cell_size, board, move):
         board, move, victory = make_move(board, move, column)
         return board, move, victory, column
 
-def play_again_window():
-    root = tk.Tk()
-    root.title("Play again")
-    root.geometry("350x250")
-    label = tk.Label(root, text="Do you want to play again", font=("Arial", 14))
-    label.pack(pady=20)
-    btn1 = tk.Button(root, text="Yes", width=10, command=lambda: play_again(True, root))
-    btn1.pack(pady=5)
-    btn2 = tk.Button(root, text="No", width=10, command=lambda: play_again(False, root))
-    btn2.pack(pady=5)
-    root.mainloop()
-
-
 def game_mode_menu():
     root = tk.Tk()
     root.title("Choose game mode")
@@ -390,7 +377,65 @@ def button_size(X, Y):
     button_width = (X * 0.2) * button_ratio[0] / (button_ratio[0] + button_ratio[1])
     button_height = (Y * 0.2) * button_ratio[1] / (button_ratio[0] + button_ratio[1])
     return int(button_width), int(button_height)
+def draw_button(surface, x, y, width, height, text, font, color):
+    button_rect = pygame.Rect(0, 0, width, height)
+    button_rect.center = (x, y)
+    pygame.draw.rect(surface, color, button_rect)
+    text_surface = font.render(text, True, (255, 255, 255))
+    text_rect = text_surface.get_rect(center=button_rect.center)
+    surface.blit(text_surface, text_rect)
+    return button_rect
 
+def play_again_window(display_surface, background, victory, winner, X, Y, button_width, button_height, font):
+    running = True
+    Draw = pygame.image.load("Draw.png")
+    Red_win = pygame.image.load("Red_win.png")
+    Blue_win = pygame.image.load("Blue_win.png")
+    window_rect = Draw.get_rect(center=(X//2, Y//2))
+    
+    while running:
+        display_surface.blit(background, (0, 0))
+        overlay = pygame.Surface((X, Y))
+        overlay.set_alpha(150)
+        overlay.fill((0, 0, 0))
+        display_surface.blit(overlay, (0, 0))
+
+        window_width, window_height = 400, 300
+        window_x, window_y = (X - window_width)//2, (Y - window_height)//2
+        pygame.draw.rect(display_surface, (255,255,255), (window_x, window_y, window_width, window_height), border_radius=15)
+        
+        if victory == False:
+            display_surface.blit(Draw, window_rect)
+        else:
+            if winner == "O":
+                display_surface.blit(Red_win, window_rect)
+            else:
+                display_surface.blit(Blue_win, window_rect)
+
+        Yes_button = draw_button(display_surface, X//2 - 100, Y//2 + 100, button_width, button_height, "Yes", font, (0, 128, 0))
+        No_button = draw_button(display_surface, X//2 + 100, Y//2 + 100, button_width, button_height, "No", font, (255, 0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                return False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if Yes_button.collidepoint(event.pos):
+                    return True
+                if No_button.collidepoint(event.pos):
+                    return False
+
+        pygame.display.flip()
+    #root = tk.Tk()
+    #root.title("Play again")
+    #root.geometry("350x250")
+    #label = tk.Label(root, text="Do you want to play again", font=("Arial", 14))
+    #label.pack(pady=20)
+    #btn1 = tk.Button(root, text="Yes", width=10, command=lambda: play_again(True, root))
+    #btn1.pack(pady=5)
+    #btn2 = tk.Button(root, text="No", width=10, command=lambda: play_again(False, root))
+    #btn2.pack(pady=5)
+    #root.mainloop()
 
 def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x, screen_color):
     pygame.display.set_caption("Play")
@@ -433,16 +478,6 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x,
 
         pygame.display.flip()
     pygame.quit()
-
-def draw_button(surface, x, y, width, height, text, font, color):
-    button_rect = pygame.Rect(0, 0, width, height)
-    button_rect.center = (x, y)
-    pygame.draw.rect(surface, color, button_rect)
-    text_surface = font.render(text, True, (255, 255, 255))
-    text_rect = text_surface.get_rect(center=button_rect.center)
-    surface.blit(text_surface, text_rect)
-    return button_rect
-
 
 def play_menu(X, Y, button_width, button_height, font, music_playing, circle_x, screen_color):
     global move
@@ -590,6 +625,46 @@ def options_menu(music_playing, X, Y, button_width, button_height , font, circle
     pygame.quit()
     return circle_rect.centerx, None, screen_color
 
+def rules_menu(X, Y, button_width, button_height, font, music_playing, screen_color):
+    pygame.display.set_caption("Rules")
+    display_surface = pygame.display.set_mode((X, Y))
+    running = True
+    page = 1
+
+    page_1 = pygame.image.load("Page_1.png")
+    page_2 = pygame.image.load("Page_2.png")
+    page_3 = pygame.image.load("Page_3.png")
+    page_rect = Page_1.get_rect(center=(X//2, Y//2))
+    
+    while running: 
+        display_surface.fill(screen_color)
+
+        back_button = draw_button(display_surface,0+button_width, 0+button_height, button_width, button_height, "Back", font, (34,34,34))
+        next_button = draw_button(display_surface, X-button_width, Y - button_height, button_width, button_height, "==>", font, (34,34,34))
+        previous_button = draw_button(display_surface, 0+button_width, Y- button_height, button_width, button_height, "<==", font, (34,34,34))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.collidepoint(event.pos):
+                    running = False
+                    return "back"
+                if next_button.collidepoint(event.pos):
+                    if page >=3:
+                        page = 1
+                    else:
+                        page+=1
+                if previous_button.collidepoint(event.pos):
+                    if page <=1:
+                        page = 3
+                    else:
+                        page-=1
+                        
+        pygame.display.flip()
+
+    pygame.quit()
+    return None
 
 def play(move, screen_color):
     display_surface = pygame.display.set_mode((X, Y))
@@ -630,7 +705,9 @@ def play(move, screen_color):
                     if victory == True:
                         pygame.display.flip()
 
-                        play_again_window()
+                        winner = get_player_symbol(move)
+                        background = display_surface.copy()
+                        next_game = play_again_window(display_surface, background, victory, winner, X, Y, button_width, button_height, font)
                         if next_game == True:
                             board = new_board(num_row)
                             move = 0
@@ -639,8 +716,11 @@ def play(move, screen_color):
                             return "back"
                         
                     elif victory == False and draw_checker(board):
+                        pygame.display.flip()
                         print("Draw")
-                        play_again_window()
+                        winner = get_player_symbol(move)
+                        background = display_surface.copy()
+                        next_game = play_again_window(display_surface, background, victory, winner, X, Y, button_width, button_height, font)
                         
                         if next_game == True:
                             board = new_board(num_row)
@@ -674,7 +754,9 @@ def play(move, screen_color):
                 if victory == True:
                     pygame.display.flip()
 
-                    play_again_window()
+                    winner = get_player_symbol(move)
+                    background = display_surface.copy()
+                    next_game = play_again_window(display_surface, background, victory, winner, X, Y, button_width, button_height, font)
                     if next_game == True:
                         board = new_board(num_row)
                         move = 0
@@ -684,7 +766,9 @@ def play(move, screen_color):
                     
                 elif victory == False and draw_checker(board):
                         print("Draw")
-                        play_again_window()
+                        winner = get_player_symbol(move)
+                        background = display_surface.copy()
+                        next_game = play_again_window(display_surface, background, victory, winner, X, Y, button_width, button_height, font)
                         
                         if next_game == True:
                             board = new_board(num_row)
