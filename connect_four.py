@@ -470,7 +470,11 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x,
                 if options_button.collidepoint(event.pos):
                     circle_x, result, screen_color = options_menu(music_playing, X, Y, button_width, button_height , font, circle_x, screen_color)
                     if result == "back":
-                        pass  
+                        pass
+                if rules_button.collidepoint(event.pos):
+                    result = rules_menu(X, Y, button_width, button_height, font, music_playing, screen_color)
+                    if result == "back":
+                        pass
                 if exit_button.collidepoint(event.pos):
                     pygame.quit()
                     sys.exit()
@@ -634,14 +638,20 @@ def rules_menu(X, Y, button_width, button_height, font, music_playing, screen_co
     page_1 = pygame.image.load("Page_1.png")
     page_2 = pygame.image.load("Page_2.png")
     page_3 = pygame.image.load("Page_3.png")
-    page_rect = Page_1.get_rect(center=(X//2, Y//2))
+    page_rect = page_1.get_rect(center=(X//2, Y//2))
     
     while running: 
         display_surface.fill(screen_color)
-
-        back_button = draw_button(display_surface,0+button_width, 0+button_height, button_width, button_height, "Back", font, (34,34,34))
-        next_button = draw_button(display_surface, X-button_width, Y - button_height, button_width, button_height, "==>", font, (34,34,34))
-        previous_button = draw_button(display_surface, 0+button_width, Y- button_height, button_width, button_height, "<==", font, (34,34,34))
+        if page == 1:
+            display_surface.blit(page_1, page_rect)
+        if page == 2:
+            display_surface.blit(page_2, page_rect)
+        if page == 3:
+            display_surface.blit(page_3, page_rect)
+            
+        back_button = draw_button(display_surface,X-button_width/2, 0+button_height//2, button_width, button_height, "Back", font, (34,34,34))
+        next_button = draw_button(display_surface, X-button_width//2, Y - button_height//2, button_width, button_height, "==>", font, (34,34,34))
+        previous_button = draw_button(display_surface, 0+button_width//2, Y- button_height//2, button_width, button_height, "<==", font, (34,34,34))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
