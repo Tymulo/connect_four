@@ -345,8 +345,7 @@ def click_move(cell_size, board, move):
     mouse_x = mouse[0] - 40
     column = mouse_x // (cell_size + 10)
     if column > (len(board)) or column < 0 or (board[0][column]) != " ":
-        print("Invalid column ")
-        return board, move
+        return board, move, False, False
     else:
         board, move, victory = make_move(board, move, column)
         return board, move, victory, column
@@ -377,6 +376,7 @@ def button_size(X, Y):
     button_width = (X * 0.2) * button_ratio[0] / (button_ratio[0] + button_ratio[1])
     button_height = (Y * 0.2) * button_ratio[1] / (button_ratio[0] + button_ratio[1])
     return int(button_width), int(button_height)
+
 def draw_button(surface, x, y, width, height, text, font, color):
     button_rect = pygame.Rect(0, 0, width, height)
     button_rect.center = (x, y)
@@ -763,7 +763,6 @@ def play(move, screen_color):
 
                 if victory == True:
                     pygame.display.flip()
-
                     winner = get_player_symbol(move)
                     background = display_surface.copy()
                     next_game = play_again_window(display_surface, background, victory, winner, X, Y, button_width, button_height, font)
