@@ -115,10 +115,9 @@ def draw_checker(board):
     else:
         return False
 
-def set_mode(mode, root):
+def set_mode(mode):
     global game_mode
     game_mode = mode
-    root.destroy()
     if game_mode == "2p":
         print("2p")
     elif game_mode == "easy":
@@ -306,12 +305,6 @@ def hard_bot(board, move):
 
     return best_col
 
-def play_again(next, root):
-    global next_game
-    next_game = next
-    root.destroy()
-    
-
 def calculate_cell_size(Y, num_row):
     y = (Y // num_row) - 20
     return y
@@ -350,25 +343,35 @@ def click_move(cell_size, board, move):
         board, move, victory = make_move(board, move, column)
         return board, move, victory, column
 
-def game_mode_menu():
-    root = tk.Tk()
-    root.title("Choose game mode")
-    root.geometry("350x250")
-    label = tk.Label(root, text="Chose game mode:", font=("Arial", 14))
-    label.pack(pady=20)
+def game_mode_menu(display_surface, X, Y, button_width, button_height, font):
+    running = True
+    display_surface.fill(screen_color)
+    
+    while running:
+        two_player_button = draw_button(display_surface, X//2, Y//2 - button_height - 10, button_width, button_height, "2 Players", font, (34,34,34))
+        easy_bot_button = draw_button(display_surface, X//2, Y//2, button_width, button_height, "Easy Bot", font, (34,34,34))
+        medium_bot_button = draw_button(display_surface, X//2, Y//2 + button_height + 10, button_width, button_height, "Medium Bot", font, (34,34,34))
+        hard_bot_button = draw_button(display_surface, X//2, Y//2 + 2*button_height + 20, button_width, button_height, "Hard Bot", font, (34,34,34))
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if two_player_button.collidepoint(event.pos):
+                    set_mode("2 Players")
+                    running = False
+                if easy_bot_button.collidepoint(event.pos):
+                    set_mode("Easy Bot")
+                    running = False
+                if medium_bot_button.collidepoint(event.pos):
+                    set_mode("Medium Bot")
+                    running = False
+                if hard_bot_button.collidepoint(event.pos):
+                    set_mode("Hard Bot")
+                    running = False
 
-    btn1 = tk.Button(root, text="2 Players", width=10, command=lambda: set_mode("2p", root))
-    btn1.pack(pady=5)
-
-    btn2 = tk.Button(root, text="Easy Bot", width=10, command=lambda: set_mode("easy", root))
-    btn2.pack(pady=5)
-
-    btn3 = tk.Button(root, text="Medium Bot", width=10, command=lambda: set_mode("medium", root))
-    btn3.pack(pady=5)
-
-    btn4 = tk.Button(root, text="Hard Bot", width=10, command=lambda: set_mode("hard", root))
-    btn4.pack(pady=5)
-    root.mainloop()
+        pygame.display.flip()
+    return None
 
 
 def button_size(X, Y):
@@ -426,16 +429,6 @@ def play_again_window(display_surface, background, victory, winner, X, Y, button
                     return False
 
         pygame.display.flip()
-    #root = tk.Tk()
-    #root.title("Play again")
-    #root.geometry("350x250")
-    #label = tk.Label(root, text="Do you want to play again", font=("Arial", 14))
-    #label.pack(pady=20)
-    #btn1 = tk.Button(root, text="Yes", width=10, command=lambda: play_again(True, root))
-    #btn1.pack(pady=5)
-    #btn2 = tk.Button(root, text="No", width=10, command=lambda: play_again(False, root))
-    #btn2.pack(pady=5)
-    #root.mainloop()
 
 def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x, screen_color):
     pygame.display.set_caption("Play")
@@ -462,7 +455,7 @@ def main_menu(X, Y, button_width, button_height , font, music_playing, circle_x,
                     if result == "back":
                         pass  
                     elif result == "play":
-                        game_mode_menu()
+                        game_mode_menu(display_surface, X, Y, button_width, button_height, font)
                         result_p = play(move, screen_color)
                         if result_p == "back":
                             pass
@@ -810,32 +803,37 @@ def play(move, screen_color):
         pygame.display.flip()
     pygame.quit()
     
-    
+def load_options():
+    with open("options.txt") as file:
+        options_list = []
+        for line in file:
+            new_line = line.strip()
+            options_list.append(new_line.split(";"))
+    return options_list
+
 if __name__ == "__main__":
     import random
-    import tkinter as tk
     import copy
     import pygame
     import sys
 
     game_mode = None
-
     num_row = 6
     num_col = 7
-
     board = new_board(num_row)
-
     pause = False
     music_playing = True
-    
+    X, Y = 1280, 720
+
     screen_color = (99, 203, 237)
+    
     white = (255, 255, 255)
     blue = (0, 0, 128)
     gray = (128, 128, 128)
     green = (0, 128, 0)
     red = (255,0,0)
-    X, Y = 1280, 720
-
+   
+    print(load_options())
     pygame.init()
     pygame.mixer.init()
     pygame.display.set_caption("Play")
@@ -854,8 +852,6 @@ if __name__ == "__main__":
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
-    display_surface = pygame.display.set_mode((X, Y))
-    font = pygame.font.Font('freesansbold.ttf', 18)
     button_width, button_height = button_size(X, Y)
     cell_size = calculate_cell_size(Y, num_row)
     grid_rect = grid_size(num_row, num_col, cell_size)
